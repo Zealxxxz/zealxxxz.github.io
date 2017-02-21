@@ -389,7 +389,7 @@ var CVModel={
             if (CVModel.animate.data.menuScrollState!=state) {
                 CVModel.animate.data.menuScrollState=state;
                 
-                CVModel.obj.menuIcon.src="img/menu/"+CVModel.animate.data.menuScrollState+".png";
+                CVModel.obj.menuIcon.src="img/menu/"+CVModel.animate.data.menuScrollState+"x.png";
                 CVModel.obj.background.style.backgroundColor=CVModel.data.bgColor[CVModel.animate.data.menuScrollState];
                 CVModel.obj.menuCenter.style.backgroundColor=CVModel.data.centerColor[CVModel.animate.data.menuScrollState];
                 CVModel.obj.title.innerHTML=CVModel.data.title[CVModel.animate.data.menuScrollState];
