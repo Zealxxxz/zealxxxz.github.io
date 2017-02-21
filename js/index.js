@@ -1055,7 +1055,7 @@ var CVModel={
                     clearInterval(timer1);
                     addPicture(3);
                 };
-            }, 10);
+            }, 1000);
             var paintIndex=3;
             var tempHeight=0;
             var adderIndex=0;
