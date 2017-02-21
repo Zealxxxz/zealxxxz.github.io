@@ -1,0 +1,281 @@
+*{
+	margin: 0; padding: 0;
+	font-family: 'Microsoft YaHei','Heiti SC';
+	font-size: 12px;
+}
+body{
+	background: green; 
+}
+
+/*导航部分，语言选择*/
+.nav{
+	height: 30px; padding: 10px;
+}
+.language_btn{
+	height: 30px; width: 80px; border-radius: 4px; float: right; margin-left: 10px;
+	line-height: 30px; text-align: center; color: #fff;  cursor: pointer; font-size: 12px;
+}
+.language_btnActive{
+	background: pink;
+}
+/**/
+.content{
+	width: 960px; height: 640px; position: relative; margin: 0 auto;
+}
+/*标题*/
+.title{
+	width: 230px; height: 40px; margin: 0 auto; margin-bottom: 30px;
+	line-height: 40px; text-align: center; font-size: 24px; background: #9c9b2b; color:#fff; border-radius: 3px; box-shadow: 1px 1px black;	
+}
+/*菜单部分样式*/
+.menu{
+	width: 500px; height: 500px; border-radius: 250px;
+	z-index: 2;
+	position: absolute; left: 230px;
+}
+.menuFx{
+	width: 400px; height: 400px;  background: url(../img/menu/圆环.png); 
+	position: absolute;z-index: 1; top: 50px; left: 50px;
+	border-radius: 200px;	
+}
+.menuCenter{
+	width: 350px; height: 350px;  border-radius: 175px; background: #9c9b2b;
+	position: absolute; top: 75px; left: 75px; z-index: 10; cursor:pointer;		
+}
+.menuIcon{
+	position: absolute; left: 83px; top: 75px;
+}
+.menuSelector{
+	width: 500px; height: 500px; background: url(../img/menu/selector.png); border-radius: 250px; cursor: pointer;
+	position: absolute;
+	box-shadow: 1px 1px 1px;
+}
+
+
+/*底部信息栏部分*/
+.info{
+	width: 100%; height: 40px; margin-top: 560px;
+	line-height: 40px; text-align: center; font-size: 24px; color:#fff;
+}
+/**/
+.page{
+	width: 960px; height: 540px; position: absolute; top: 52px; 
+	left: 50%; margin-left: -480px; z-index: 0;
+}
+#page2,#page4{
+	display: none;
+}
+/*信息容器*/
+.box{
+	width: 0px; height: 260px; background: #9c9b2b;
+	display: block; z-index: 0; box-shadow: 1px 1px black; border-radius: 5px; 
+	position: absolute; top: 137px; left: 400px; display: none; color:#fff; overflow: hidden;
+	padding: 30px; box-sizing:border-box; padding-left: 60px; 
+}
+.list0, .list0 *{
+	height: 30px; line-height: 30px; font-size: 16px; margin-bottom: 10px;
+}
+.list0 .name{
+	width: 100px; float: left; 
+}
+.list0 .bar{
+	 margin-left: 100px;  background: #5a6d26; position: relative; border-radius: 2px; box-shadow: 1px 1px black;
+}
+.list0 .filter{
+	width: 30%; background: #6d9332; border-radius: 2px;
+}
+.box1{
+	width: 0;height: 0; background: #554c7e; position: absolute; cursor: pointer;
+	 z-index: 0; box-shadow: 1px 1px 1px; border-radius: 5px; 
+}
+.box1content{
+	display: none;
+}
+.content2Img img{
+	width: 470px; height: 220px;
+}
+.contentTitleA,.contentTitleB{
+	line-height: 30px; color: #fff; font-size: 16px; padding-left: 20px; padding-right: 20px;
+}
+.contentTitleB{
+	text-align: right;
+}
+#box10{top: 260px; left: 470px;}
+#box11{top: 260px; right: 470px;}
+#box12{bottom: 260px; left: 470px;}
+#box13{bottom: 260px; right: 470px;}
+
+.box2,.box4{
+	width: 470px;height: 260px; background: #5f802d; position: absolute; cursor: pointer;
+	display: none; z-index: 0; box-shadow: 1px 1px 1px; border-radius: 5px; opacity: 0; 
+}
+.box2{
+	box-sizing:border-box; padding: 20px;
+}
+.box2 p{
+	line-height: 20px; color: #fff; font-size: 16px; margin-bottom: 20px;
+}
+#box23 p{
+	margin-left: 80px;
+}
+.box4{
+	background: #b98d10;
+}
+#box20,#box40{top: 0; left: 0;}
+#box21,#box41{top: 0; right: 0;}
+#box22,#box42{bottom: 0; left: 0;}
+#box23,#box43{bottom: 0; right: 0;}
+.box2close,.box4close{
+	position: absolute; top: 180px; left: 388px; z-index: 10; cursor: pointer; display: none; border-radius: 40px; background: #9c9b2b;
+}
+
+.companyLogo{
+	position: absolute; height: 50px; bottom: 0; line-height: 40px; font-size: 20px; color: #fff;
+}
+.companyLogo1{
+	right: 0;
+}
+.companyLogo3{
+	right: 0;
+}
+
+
+.box3{
+	width: 430px; height: 100px; background: #984992; position: absolute; bottom: -10px; left: 245px;
+	opacity: 0; display: none; color:#fff; padding: 20px; border-radius: 5px; box-shadow: 1px 1px black;
+}
+.list3,.list3 span{
+	height: 50px; line-height: 50px; font-size: 16px;
+}
+
+.box4close{
+	background: #d7a01e;
+}
+/*音乐播放器*/
+#musicBox{
+	 color:#fff;
+}
+#musicTitle{
+	position: absolute; top: 10px; left: 150px;
+}
+#PlayPause{
+	position: absolute; top: 40px; left:30px; cursor: pointer;
+}
+#Reset{
+	position: absolute; top: 100px; left:30px; cursor: pointer;
+}
+#Volume{
+	position: absolute; top: 70px; left:30px;
+}
+#musicBox>#Volume>div{
+	float: left;
+}
+#Reset,#PlayPause,#volumeTitle{
+	width: 50px; height: 20px; background: #6666BB;
+	border-radius: 2px; line-height: 20px; text-align: center;
+}
+#Reset{
+	clear: both;
+}
+#musicVolume{
+	width: 100px; height: 20px; background: black;
+	border: 1px solid #120FCA; margin-left: 20px;
+	position: relative; border-radius: 8px;
+}
+#musicFilter{
+	width: 70px; height: 20px; background: #F1F5F1; border-radius: 10px 0 0 10px;
+}
+#bar{
+	width: 20px; height: 20px; background: #A0A0A0
+	; position: absolute;
+	left: 60px; top: 0; cursor: pointer; border-radius: 10px;
+}
+
+/*画廊*/
+.BigPop{
+	width: 962px; height: 522px; background: #fff; position: absolute;
+	top: 52px; left: 0px; z-index: 100; display: none; opacity: 0;
+}
+.BigPopCloseBtn{
+	width: 50px; height: 50px; position: absolute; right: 10px; top: 10px;
+	cursor: pointer; background: #172590; border-radius: 5px;
+}
+.BigPopShowArea{
+	width: 100%; height: 400px; background: #fff;
+}
+.BigPopShowArea>a{
+	float: left;
+}
+.BigPopDesArea{
+	width: 100%; height: 142px; background: #178590; padding: 10px;
+	box-sizing:border-box; color:#fff;
+		}
+#box41Pop{
+	overflow: auto; background: #10A5A5;
+	border-top: 10px solid #107CA5; border-bottom: 10px solid #A5108F;
+}
+#box41Pop>.BigPopShowArea{
+	box-sizing:border-box; padding: 10px; height: auto; background: #10A5A5;
+}
+#box41Pop>.BigPopDesArea{
+	position: fixed; bottom:0;
+}
+.BigPopDesArea *{
+	line-height: 20px; font-size: 16px; margin-bottom: 20px;
+}
+.imgContainer{
+	width: 300px; float: left; background: #fff;
+	margin-right: 10px; margin-top: -20px;
+}
+#gallery1{
+	background: #6A67EF;
+}
+#gallery2{
+	background: #F5A9A9;
+}
+#gallery3{
+	margin-right: 0px; background: #9E8A8A;
+}
+.picture{
+	width: 300px; cursor: pointer; display: block; margin-top: 10px;
+}
+#p531{
+	width: 963px; height: 542px; position: absolute;
+	box-sizing:border-box; 
+	border-top: 10px solid #107CA5; border-left: 10px solid #10A5A5;
+	border-right: 10px solid #F5A9A9; border-bottom: 10px solid #A5108F;
+	background: black; display: none; text-align: center; z-index: 100; opacity: 0;
+	top: 52px; left: 0px;
+}
+#p531CloseBtn{
+	width: 50px; height: 50px; position: absolute; right: 10px; top: 10px;
+	cursor: pointer; background: #172590; border-radius: 5px;
+}
+.box5{
+	width: 430px; height: 220px; background: #a22b22; cursor: pointer; 
+	display: block; z-index: 0; box-shadow: 1px 1px 1px #a22b22; border-radius: 5px; 
+	position: absolute; top: 140px; left: 245px; 
+	transform:rotateX(270deg);
+	-ms-transform:rotateX(270deg); 	/* IE 9 */
+	-moz-transform:rotateX(270deg); 	/* Firefox */
+	-webkit-transform:rotateX(270deg); /* Safari 和 Chrome */
+	-o-transform:rotateX(270deg); 
+	padding: 20px; color:#fff; border: 2px solid #FFB62E;
+}
+.box5 *{
+	line-height: 20px; font-size: 16px; margin-bottom: 20px;
+}
+.boxBg{
+	width: 470px; height: 260px;
+}
+.boxShadow{
+	width: 470px; height: 260px; background: rgba(0,0,0,0.7); position: absolute; top: 0; left: 0;
+	line-height: 260px; text-align: center; color: #fff; display: none; font-size: 40px;
+}
+.boxInfo{
+	width: 470px; height: 260px;  position: absolute; top: 0; left: 0;
+	line-height: 260px; text-align: center; color: #fff; font-size: 40px;	
+}
+.boxinfo1{
+	font-size: 20px; line-height: 230px;
+}

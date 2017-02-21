@@ -1,867 +1,1127 @@
-		var CVModel={
-			Obj:{
-				oMainFrame:document.getElementsByClassName('mainFrame')[0],
-				oMain:document.getElementsByClassName("center")[0],
-				oSelector:document.getElementById('Selector'),
-				oPicture:document.getElementById('icon'),
-				oImgBg:document.getElementById('img'),
-				oMainTitle:document.getElementsByClassName('mainTitle')[0],
-				oPicture:document.getElementById('icon'),
-				oInfoShowArea:document.getElementById('infoShowArea'),
-				oPopK1:document.getElementById('popAreaK1'),
-				oPopK3:document.getElementById('popAreaK3'),
-				oPopK4:document.getElementById('popArea25'),
-				oPopK5:document.getElementById('popArea35'),
-				popAreaK1Content:document.getElementById("popAreaK1Content"),
-				oPopTings1:document.getElementsByClassName('popArea3'),
-				oPopTings2:document.getElementsByClassName('popArea2'),
-				oPopContent4:document.getElementById('popAreaK4'),
-				oPopContent2:document.getElementsByClassName('popArea'),
-				oContent1:document.getElementsByClassName("c1"),
-				oContent5:document.getElementsByClassName("c5"),
-				oContent6:document.getElementsByClassName("c6"),
-				
-				oBigPopOpen:document.getElementsByClassName("detailPop"),
-				oBigPopArea:document.getElementsByClassName("BigPop"),
-				oBigPopCloseBtn:document.getElementsByClassName("BigPopCloseBtn"),
+//requestAnimationFrame封装
+(function() {
+    var lastTime = 0;
+    var vendors = ['webkit', 'moz'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||    // Webkit中此取消方法的名字变了
+                                      window[vendors[x] + 'CancelRequestAnimationFrame'];
+    }
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
+            var id = window.setTimeout(function() {
+                callback(currTime + timeToCall);
+            }, timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+    }
+    if (!window.cancelAnimationFrame) {
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+    }
+}());
+//
 
-				oPlayPause:document.getElementById('PlayPause'),
-				oReset:document.getElementById('Reset'),
-				oBar:document.getElementById('bar'),
-				oMusicFilter:document.getElementById('musicFilter'),
-			},
-			Data:{
-				centerColor:[
-					"#9c9b2b",
-					"#172590",
-					"#5a6d26",
-					"#72297b",
-					"#B98D10",
-					"#a22b22"
-				],
-				bgColor:[
-					"#6d9332",
-					"#4857BF",
-					"#9c9b2b",
-					"#9c2b93",
-					"#d7a01e",
-					"#ce3c31"				
-				],
-				title:[
-					"职业技能",
-					"过往作品",
-					"期望工作",
-					"联系方式",
-					"兴趣爱好",
-					"福利赠送"				
-				],
-				info1:[
-					"只有想不到没有做不到",
-					"其实我在想以后项目经验再多了咋办？",
-					"想做的太多但要做的却只能一个",
-					"对我感兴趣请联系我，一定要联系我",
-					"业余生活很丰富，但到底来说还是宅男，只能自嗨",
-					"如此具有冲击力的选项（色彩）切换有没有亮瞎你的眼？"
-				]
-			},
-			Property:{
-				ableToClick:true,
-				switchStatus:true,
-				wheelSpeed:3,
-				status:0,
-				oSelectordeg:0,
-				tabWidth:500, //MAX 500 MIN 350
-				tabChangeSpeed:10,
-				centerRotation:0,
-				pop3Rotation:270,
-				pop2Left:260,
-				pop2Top:470,
-				pop2xSpeed:47,//方框缩放速度
-				pop2ySpeed:26,//方框缩放速度
-			},
-			init:function(){
-				//主题内容位置确定
-				var ScreenHeight=document.body.scrollHeight;
-				if (ScreenHeight>500) {
-					CVModel.Obj.oMainFrame.style.marginTop=(ScreenHeight-CVModel.Obj.oMainFrame.offsetHeight)/2+'px';
-				}
-				var oRound=document.getElementById('imgBg');
-				var rotation=0;
-				var b=0;
-				setInterval(function(){
-					if (rotation==360) {
-						rotation=0;
-					}
-					else{
-						rotation=rotation+1.5;
-					}
-					document.getElementsByClassName("loadingBg")[0].style.transform=oRound.style.transform='rotate('+rotation+'deg)';
+var CommonTools={
+	ready:function(fn){
+        if(document.addEventListener){  //标准浏览器
+            document.addEventListener('DOMContentLoaded',function(){
+                //注销事件，避免反复触发
+                document.removeEventListener('DOMContentLoaded',arguments.callee,false);
+                fn();
+            },false)
+        }
+        else if(document.attachEvent){    //IE，两个条件
+            document.attachEvent('onreadystatechange',function(){
+                if(document.readyState=='complete'){
+                    //注销事件，避免反复触发
+                    document.detachEvent('onreadystatechange',arguments.callee);
+                    fn();
+                }
+            });
+        }
+	},
+	checkDeviceLanguage:function(){
 
-				},30);		
-			},
-			main:{
-				//主体程序
-				run:function(){
-					CVModel.Obj.oMain.addEventListener('touchmove', function(ev){
-						if (CVModel.Property.switchStatus) {
-							CVModel.main.statusChange(ev);
-						};
-						return false;
-					}, false);					
-					CVModel.Obj.oMain.addEventListener('DOMMouseScroll', function(ev){
-						if (CVModel.Property.switchStatus) {
-							CVModel.main.statusChange(ev);
-						};
-						return false;
-					}, false);
-					CVModel.Obj.oMain.onmousewheel=function(ev){
-						if (CVModel.Property.switchStatus) {
-							CVModel.main.statusChange(ev);
-						};
-						return false;
-					}
-					CVModel.Obj.oMain.onclick=function(){
-						if (CVModel.Property.ableToClick) {
+	},
+    animator:function(){
 
-							if (!CVModel.Property.switchStatus) {
-								switch(CVModel.Property.status){
-									case 0:CVModel.main.contentSwitch.switch0A(); break;
-									case 1:CVModel.main.contentSwitch.switch1A(); break;
-									case 2: break;
-									case 3:CVModel.main.contentSwitch.switch3A(); break;
-									case 4: break;
-									case 5: break;
-								}
-							}
-							else{
-								switch(CVModel.Property.status){
-									case 0:CVModel.main.contentSwitch.switch0B(); break;
-									case 1:CVModel.main.contentSwitch.switch1B(); break;
-									case 2:CVModel.main.contentSwitch.switch2B(); break;
-									case 3:CVModel.main.contentSwitch.switch3B(); break;
-									case 4:CVModel.main.contentSwitch.switch4B(); break;
-									case 5:CVModel.main.contentSwitch.switch5B(); break;
-								}
-							}							
-						};
-					}
-					CVModel.Obj.oPopK3.onclick=function(){
-						if (CVModel.Property.ableToClick) {
-							CVModel.main.contentSwitch.switch2A();
-						};
-					}
-					CVModel.Obj.oPopK4.onclick=function(){
-						if (CVModel.Property.ableToClick) {
-							CVModel.main.contentSwitch.switch4A();
-						};
-					}					
-					CVModel.Obj.oPopK5.onclick=function(){
-						if (CVModel.Property.ableToClick) {
-							CVModel.main.contentSwitch.switch5A();
-						};
-					}
-					for (var i = 0; i < CVModel.Obj.oBigPopOpen.length; i++) {
-						CVModel.Obj.oBigPopOpen[i].onclick=function(){
-							var id="p"+this.id;
-							var popContent=document.getElementById(id);
-							if (popContent) {
-								var opacity=0;
-								popContent.style.opacity=opacity;
-								popContent.style.display="block";
-								var timer1 = setInterval(function(){
-									if (opacity<1) {
-										opacity+=0.1;
-										popContent.style.opacity=opacity;
-									}
-									else{
-										clearInterval(timer1);
-										CVModel.Property.ableToClick=false;
-										if (id=="p53") {
-											CVModel.main.addPainter();
-										};
-									}
-								},30);								
-							};
-						}						
-					};
-					for (var i = 0; i < CVModel.Obj.oBigPopCloseBtn.length; i++) {
-						CVModel.Obj.oBigPopCloseBtn[i].onclick=function(){
-							var vId;
-							if (this.parentNode.className=="BigPop") {
-								this.parentNode.style.display="none";
-								vId=this.parentNode.id.replace("p","v");
-							}
-							else if(this.parentNode.parentNode.className=="BigPop"){
-								this.parentNode.parentNode.style.display="none";
-								vId=this.parentNode.parentNode.id.replace("p","v");
-							}
-							var tempContainer=null;
-							var tempContainer =document.getElementById(vId);
-							if (tempContainer!=null) {
-								var tempSrc =tempContainer.src;
-								tempContainer.src="";
-								tempContainer.src=tempSrc;
-							};
-							CVModel.Property.ableToClick=true;
-						}						
-					};	
-					CVModel.main.popContentFunction();
-					document.getElementById("loading").style.display="none";
-				},
-				//状态转换
-				statusChange:function(ev){
-					var wheelSpeed;
-					var tempStatus=CVModel.Property.status;
-					if (CVModel.Property.ableToClick) {
-						if (ev.wheelDelta>0) {
-							wheelSpeed=CVModel.Property.wheelSpeed;
-						}
-						else{
-							wheelSpeed=-CVModel.Property.wheelSpeed;
-						}
-						for (var i = 0; i < 6; i++) {
-							var timer =setTimeout(function(){
-								CVModel.Property.oSelectordeg+=wheelSpeed;
-								CVModel.Obj.oSelector.style.transform='rotate('+(CVModel.Property.oSelectordeg)+'deg)';
-								CVModel.Obj.oSelector.style.webkitTransform='rotate('+(CVModel.Property.oSelectordeg)+'deg)';
-								//alert(CVModel.Obj.oSelector.style.webkitTransform);
-								typeSwitch();
-								if (CVModel.Property.oSelectordeg>=360) {
-									CVModel.Property.oSelectordeg-=360;
-								};
-								if (CVModel.Property.oSelectordeg<=0) {
-									CVModel.Property.oSelectordeg+=360;
-								};
-							}, 10);
-						};
-					};
-					function typeSwitch(){
-						if (CVModel.Property.oSelectordeg<30||CVModel.Property.oSelectordeg>=330) {
-							tempStatus=0;
-						}else if(CVModel.Property.oSelectordeg>=270&&CVModel.Property.oSelectordeg<330){
-							tempStatus=1;
-						}
-						else if(CVModel.Property.oSelectordeg>=210&&CVModel.Property.oSelectordeg<270){
-							tempStatus=2;
-						}
-						else if(CVModel.Property.oSelectordeg>=150&&CVModel.Property.oSelectordeg<210){
-							tempStatus=3;
-						}
-						else if(CVModel.Property.oSelectordeg>=90&&CVModel.Property.oSelectordeg<150){
-							tempStatus=4;
-						}
-						else if(CVModel.Property.oSelectordeg>=30&&CVModel.Property.oSelectordeg<90){
-							tempStatus=5;
-						}
-						if (CVModel.Property.status!=tempStatus) {
-							CVModel.Property.status=tempStatus;
-							//状态切换
-							//01 中心内容的切换
-							CVModel.Obj.oPicture.src="img/"+CVModel.Property.status+".png";
-							CVModel.Obj.oPicture.style.left=(350-CVModel.Obj.oPicture.offsetWidth)/2+'px';
-							CVModel.Obj.oPicture.style.top=(350-CVModel.Obj.oPicture.offsetHeight)/2+'px';
-							CVModel.Obj.oImgBg.style.backgroundColor=CVModel.Data.centerColor[CVModel.Property.status];
-							//02 标题，信息提示的切换
-							CVModel.Obj.oMainTitle.style.backgroundColor=CVModel.Data.centerColor[CVModel.Property.status];
-							CVModel.Obj.oMainTitle.innerHTML=CVModel.Data.title[CVModel.Property.status];
-							CVModel.Obj.oInfoShowArea.innerHTML=CVModel.Data.info1[CVModel.Property.status];
-							//03 底色的切换
-							document.getElementById("holeBackground").style.backgroundColor=CVModel.Data.bgColor[CVModel.Property.status];
-						}					
-					}
-					return false;					
-				},
-				//分类切换
-				contentSwitch:{
-					selectorSwitch:function(fn){
-						var timer1 = setInterval(function(){
-						if (!CVModel.Property.switchStatus) {
-							if (CVModel.Property.tabWidth<500) {
-								
-								CVModel.Property.tabWidth+=CVModel.Property.tabChangeSpeed;
-								CVModel.Obj.oSelector.style.width=CVModel.Property.tabWidth+"px";
-								CVModel.Obj.oSelector.style.height=CVModel.Property.tabWidth+"px";
-								CVModel.Obj.oSelector.style.left=(500-CVModel.Property.tabWidth)/2+'px';
-								CVModel.Obj.oSelector.style.top=CVModel.Obj.oSelector.style.left;
-							}
-							else{
-								clearInterval(timer1);
-								if (fn) {
-									fn();
-								};
-							};
-						}
-						else{
-							if (CVModel.Property.tabWidth>350) {
-								CVModel.Property.tabWidth-=CVModel.Property.tabChangeSpeed;
-								CVModel.Obj.oSelector.style.width=CVModel.Property.tabWidth+"px";
-								CVModel.Obj.oSelector.style.height=CVModel.Property.tabWidth+"px";
-								CVModel.Obj.oSelector.style.left=(500-CVModel.Property.tabWidth)/2+'px';
-								CVModel.Obj.oSelector.style.top=CVModel.Obj.oSelector.style.left;
-							}
-							else{
-								clearInterval(timer1);
-								if (fn) {
-									fn();
-								};
-							}	
-						}
-						}, 10);
-					},
-					switch0A:function(){
-						CVModel.Property.ableToClick=false;
-						var popWith=470;
-						CVModel.Obj.popAreaK1Content.style.display="none";
-						var timer1 = setInterval(function(){
-							if (popWith>0) {
-								popWith-=10;
-								CVModel.Obj.oPopK1.style.width=popWith+"px";
-							}
-							else{
-								clearInterval(timer1);
-								CVModel.Obj.oPopK1.style.display="none";
-								var centerLeft=0;
-								var timer2= setInterval(function(){
-									if (centerLeft<230) {
-										centerLeft+=10;
-										CVModel.Obj.oMain.style.left=centerLeft+"px";
-									}
-									else{
-										clearInterval(timer2);
-										CVModel.main.contentSwitch.selectorSwitch(function(){
-											CVModel.Property.ableToClick=true;
-											CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-										});
-									}									
-								}, 15);
-							}
-						},10);
-					},
-					switch0B:function(){
-						CVModel.Property.ableToClick=false;
-						var centerLeft=230;
-						CVModel.main.contentSwitch.selectorSwitch(action1);
-						function action1(){
-							var timer1 = setInterval(function(){
-								centerLeft-=10;
-								if (centerLeft>=0) {
-									CVModel.Obj.oMain.style.left=centerLeft+'px';
-								}
-								else{
-									clearInterval(timer1);
-									CVModel.Obj.oPopK1.style.display="block";
-									var popWith=0;
-									var timer2 =setInterval(function(){
-										if (popWith<470) {
-											popWith+=10;
-											CVModel.Obj.oPopK1.style.width=popWith+"px";
-										}
-										else{
-											clearInterval(timer2);
-											CVModel.Obj.popAreaK1Content.style.display="block";
-											CVModel.Property.ableToClick=true;
-											CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-										}
-									}, 10);
-								}
-							}, 15);
-						}
-					},
-					switch1A:function(){
-						var Status1 =false;
-						var Status2 =false;
-						CVModel.Property.ableToClick=false;
-						CVModel.main.contentSwitch.selectorSwitch(function(){
-							Status1 =true;
-							endCheck();
-						});
-						for (var i = 0; i < CVModel.Obj.oContent1.length; i++) {
-							CVModel.Obj.oContent1[i].style.display="none";
-						};
-						var timer1 = setInterval(function(){
-							if (CVModel.Obj.oPopContent2[0].offsetHeight>0) {
-								CVModel.Property.pop2Left+=CVModel.Property.pop2ySpeed;
-								CVModel.Property.pop2Top+=CVModel.Property.pop2xSpeed;
+    },
+    getStyle:function(obj,attr){
+        if (obj.currentStyle) {
+            return obj.currentStyle[attr];
+        }
+        else{
+            return getComputedStyle(obj, false)[attr];
+        }
+    }    
+}
+var ResumeData={
+	cn:{
+        centerColor:[
+            "#9c9b2b",
+            "#172590",
+            "#5f802d",
+            "#72297b",
+            "#B98D10",
+            "#a22b22"
+        ],
+        bgColor:[
+            "#6d9332",
+            "#4857BF",
+            "#9c9b2b",
+            "#9c2b93",
+            "#d7a01e",
+            "#ce3c31"               
+        ],
+        docTitle:'Zealxxxz的个人简历',
+        title:[
+            "职业技能",
+            "项目经历",
+            "工作经验",
+            "联系方式",
+            "软技能",
+            "关于",             
+        ],
+        info:[
+            "你见，或者不见我  我就在那里 不悲不喜",
+            "你念，或者不念我  情就在那里 不来不去",
+            "你爱，或者不爱我  爱就在那里 不增不减",
+            "你跟，或者不跟我  我的手就在你手里 不舍不弃",
+            "来我的怀里 或者 让我住进你的心里",
+            "默然 相爱 寂静 欢喜",
+        ],
+        page0info:{
 
-								CVModel.Obj.oPopContent2[0].style.top=CVModel.Property.pop2Left+'px';
-								CVModel.Obj.oPopContent2[0].style.height=(CVModel.Obj.oPopContent2[0].offsetHeight-CVModel.Property.pop2ySpeed)+'px';
-								CVModel.Obj.oPopContent2[0].style.left=CVModel.Property.pop2Top+'px';
-								CVModel.Obj.oPopContent2[0].style.width=(CVModel.Obj.oPopContent2[0].offsetWidth-CVModel.Property.pop2xSpeed)+'px';
+        },
+        page1desinfo1:[
+            "荔枝直播（原创星工场）是一个直播平台",
+            "PC端：Jquery",
+            "手机端：混合应用，SUI mobile, Jquery",
+        ],
+        page1desinfo2:[
+            "混沌与秩序 : 大型3D手机MMO网游，主要成就为烈焰岛的关卡设计，烈焰骑士的任务设计",
+            "奇异动物园 ：模拟养成类游戏,数值，商店系统，部分UI",
+        ],
+        page1desinfo3:[
+            "自制洛克人Demo，Unity3D版为完整关卡+boss战，除美术外全部为重新设计,H5版仅为BOSS战，BOSS AI 遵循原设计，可在GITHUB上<a href='https://github.com/Zealxxxz'>下载</a>",
+            "此外SwingSwing Demo的设计较为精妙，但仅剩部分片段视频<a href='http://v.youku.com/v_show/id_XNTU1NzE1OTUy.html?from=s1.8-1-1.2&spm=a2h0k.8191407.0.0'>感兴趣请点击</a>",
+        ],
+        page2info0:[
+            "负责公司前端业务的开发",
+            "态势感知项目",
+            "威胁情报项目",
+        ],
+        page2info1:[
+            "直播项目：PC端工具库，登录功能，首页的制作，手机端个人中心的制作",
+            "商城项目：商品详情页，店铺详情页，分类页面的代码重构",
+        ],
+        page2info2:[
+            "混沌与秩序项目，负责任务和音效",
+            "奇异动物园项目，负责数据和商城，多语言设计",
+            "World of war 1941 项目，负责建筑系统和UI设计",
+        ],
+        page2info3:[
+            "SwingSwing Demo的关卡制作",
+        ],
+        page3info:[
+            "电话: ",
+            "邮箱: ",
+        ],
+        page4info:{
 
-								CVModel.Obj.oPopContent2[1].style.top=CVModel.Property.pop2Left+'px';
-								CVModel.Obj.oPopContent2[1].style.height=(CVModel.Obj.oPopContent2[1].offsetHeight-CVModel.Property.pop2ySpeed)+'px';
-								CVModel.Obj.oPopContent2[1].style.right=CVModel.Property.pop2Top+'px';
-								CVModel.Obj.oPopContent2[1].style.width=(CVModel.Obj.oPopContent2[1].offsetWidth-CVModel.Property.pop2xSpeed)+'px';
 
-								CVModel.Obj.oPopContent2[2].style.bottom=CVModel.Property.pop2Left+'px';
-								CVModel.Obj.oPopContent2[2].style.height=(CVModel.Obj.oPopContent2[2].offsetHeight-CVModel.Property.pop2ySpeed)+'px';
-								CVModel.Obj.oPopContent2[2].style.left=CVModel.Property.pop2Top+'px';
-								CVModel.Obj.oPopContent2[2].style.width=(CVModel.Obj.oPopContent2[2].offsetWidth-CVModel.Property.pop2xSpeed)+'px';
+        },
+        title4:[
+            "指弹",
+            "画廊",
+            "视频",
+            "N/A",
+        ],
+        musicBox:[
+            "翻弹 Kotaro oshio -Twilight",
+            "开始",
+            "暂停",
+            "音量",
+            "重置",
+        ],             
+        page5info:"<p>三年游戏策划，一年web前端开发</p><p>纵观我的职业生涯，从核心向游戏转向网游，从游戏行业转向web开发，做的东西受众面越来越广，随着阅历的增加对待事物的看法也在不断地变化</p><p>不变的是我喜欢创造的心，喜欢分享的心，也是我感觉人生的价值所在</p><p>希望我能成为你新的伙伴! <a href='asset/web前端-李雪辰.pdf'>点此下载简历</a></p>",
+    },
+	en:{
+        centerColor:[
+            "#9c9b2b",
+            "#172590",
+            "#5a6d26",
+            "#72297b",
+            "#B98D10",
+            "#a22b22"
+        ],
+        bgColor:[
+            "#6d9332",
+            "#4857BF",
+            "#9c9b2b",
+            "#9c2b93",
+            "#d7a01e",
+            "#ce3c31"               
+        ],
+        docTitle:"Zealxxxz's Resume",
+        title:[
+            "Professional skills",
+            "Project",
+            "Working Experence",
+            "Contact",
+            "Soft Skills",
+            "About",             
+        ],
+        info:[
+            "It’s doesn’t matter if you see me or not, I am standing right there, With no emotion",
+            "It’s doesn’t matter if you miss me or not, The feeling is right there, And it isn’t going anywhere",
+            "It’s doesn’t matter if you love me or not, Love is right there, It is not going to change",
+            "It’s doesn’t matter if you are with me or not, My hand is in your hand, And I am not going to let go",
+            "Let me embrace you, or, Let me live in your heart to entirely",
+            "Silence Love, Calmness Joy",
+        ],
+        page0info:{
 
-								CVModel.Obj.oPopContent2[3].style.bottom=CVModel.Property.pop2Left+'px';
-								CVModel.Obj.oPopContent2[3].style.height=(CVModel.Obj.oPopContent2[3].offsetHeight-CVModel.Property.pop2ySpeed)+'px';
-								CVModel.Obj.oPopContent2[3].style.right=CVModel.Property.pop2Top+'px';
-								CVModel.Obj.oPopContent2[3].style.width=(CVModel.Obj.oPopContent2[3].offsetWidth-CVModel.Property.pop2xSpeed)+'px';	
-							}
-							else{
-								clearInterval(timer1);
-								for (var i = 0; i < CVModel.Obj.oPopContent2.length; i++) {
-									CVModel.Obj.oPopContent2[i].style.display="none";
-								};
-								Status2 =true;
-								endCheck();
-							}
-						}, 10);
-						function endCheck (){
-							if (Status1&&Status2) {
-								CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-								CVModel.Property.ableToClick=true;
-							}
-						}
-					},
-					switch1B:function(){
-						var Status1 =false;
-						var Status2 =false;
-						CVModel.Property.ableToClick=false;
-						CVModel.main.contentSwitch.selectorSwitch(function(){
-							Status1 =true;
-							endCheck();
-						});
-						for (var i = 0; i < CVModel.Obj.oPopContent2.length; i++) {
-							CVModel.Obj.oPopContent2[i].style.display="block";
-						};
-						var timer1 = setInterval(function(){
-							if (CVModel.Obj.oPopContent2[0].offsetHeight<260) {
-								CVModel.Property.pop2Left-=CVModel.Property.pop2ySpeed;
-								CVModel.Property.pop2Top-=CVModel.Property.pop2xSpeed;
+        },
+        page1desinfo1:[
+            "LiZhi TV, an online video platform",
+            "PC client：Jquery",
+            "Mobile client：SUI mobile, Jquery",
+        ],
+        page1desinfo2:[
+            "Order & Chaos :  A fantasy MMORPG video game，mainly achieved Flare island level design",
+            "Wonder Zoo ：A simulation game",
+        ],
+        page1desinfo3:[
+            "Mega man Demo of unity3D and H5, find source in <a href='https://github.com/Zealxxxz'>github</a>",
+            "Swing Swing Demo video <a href='http://v.youku.com/v_show/id_XNTU1NzE1OTUy.html?from=s1.8-1-1.2&spm=a2h0k.8191407.0.0'>click here</a>",
+        ],
+        page2info0:[
+            "负责公司前端业务的开发",
+            "态势感知项目",
+            "威胁情报项目",
+        ],
+        page2info0:[
+            "Leader of web front-end develop in company",
+            "态势感知Project,a big data based security management system",
+            "威胁情报Project,a security info display system",
+        ],
+        page2info1:[
+            "荔枝直播：Common library, login system, index, home page etc develop",
+            "An online shopping project on Mobile：Category, Commodity, Store details page code-refactoring",
+        ],
+        page2info2:[
+            "Order & Chaos: Level and Sound design, mainly achieved Flare island level design ",
+            "Wonder Zoo: Numerical and Shop design",
+            "World of war 1941: Building system and UI design",
+        ],
+        page2info3:[
+            "SwingSwing Demo: Level design",
+        ],
+        page3info:[
+            "Phone: ",
+            "E-mail: ",
+        ],
+        page4info:{
+            title4:[
+                "FingerStyle",
+                "Gallery",
+                "Video",
+                "N/A",
+            ],
 
-								CVModel.Obj.oPopContent2[0].style.top=CVModel.Property.pop2Left+'px';
-								CVModel.Obj.oPopContent2[0].style.height=(CVModel.Obj.oPopContent2[0].offsetHeight+CVModel.Property.pop2ySpeed)+'px';
-								CVModel.Obj.oPopContent2[0].style.left=CVModel.Property.pop2Top+'px';
-								CVModel.Obj.oPopContent2[0].style.width=(CVModel.Obj.oPopContent2[0].offsetWidth+CVModel.Property.pop2xSpeed)+'px';
+        },
+        title4:[
+            "FingerStyle",
+            "Gallery",
+            "Video",
+            "N/A",
+        ], 
+        musicBox:[
+            "Kotaro oshio -Twilight Cover",
+            "Start",
+            "Pause",
+            "Volume",
+            "Restart",
+        ],
+        page5info:"<p>3 years Game Designer and 1 year Web-front-end developer</p><p>Throughout my career,I tend to share my work to more people</p><p>I changed a lot, but one thing never change is I like to create, like to share</p><p>With to be your partner! <a href='asset/web-front-end Li Xuechen.pdf'>Download Resume</a></p>",
+    },
+}
+var CVModel={
+    data:{},//信息存储区
+	obj:{
+        docTitle:document.getElementById("docTitle"),
+        background:document.getElementById("background"),
+        content:document.getElementById("content"),
+        menuFx:document.getElementById("menuFx"),
+        menu:document.getElementById("menu"),
+        menuSelector:document.getElementById("menuSelector"),
+        menuCenter:document.getElementById("menuCenter"),
+        title:document.getElementById("title"),
+        menuIcon:document.getElementById("menuIcon"),
+        language_btn:document.getElementsByClassName("language_btn"),
+        menuIcon:document.getElementById("menuIcon"),
+        info:document.getElementById("info"),
+        pages:document.getElementsByClassName('page'),
+        box00:document.getElementById("box00"),
 
-								CVModel.Obj.oPopContent2[1].style.top=CVModel.Property.pop2Left+'px';
-								CVModel.Obj.oPopContent2[1].style.height=(CVModel.Obj.oPopContent2[1].offsetHeight+CVModel.Property.pop2ySpeed)+'px';
-								CVModel.Obj.oPopContent2[1].style.right=CVModel.Property.pop2Top+'px';
-								CVModel.Obj.oPopContent2[1].style.width=(CVModel.Obj.oPopContent2[1].offsetWidth+CVModel.Property.pop2xSpeed)+'px';
+        box10:document.getElementById("box10"),
+        box11:document.getElementById("box11"),
+        box12:document.getElementById("box12"),
+        box13:document.getElementById("box13"),
 
-								CVModel.Obj.oPopContent2[2].style.bottom=CVModel.Property.pop2Left+'px';
-								CVModel.Obj.oPopContent2[2].style.height=(CVModel.Obj.oPopContent2[2].offsetHeight+CVModel.Property.pop2ySpeed)+'px';
-								CVModel.Obj.oPopContent2[2].style.left=CVModel.Property.pop2Top+'px';
-								CVModel.Obj.oPopContent2[2].style.width=(CVModel.Obj.oPopContent2[2].offsetWidth+CVModel.Property.pop2xSpeed)+'px';
+        box2s:document.getElementsByClassName('box2'),
+        box2close:document.getElementById("box2close"),
 
-								CVModel.Obj.oPopContent2[3].style.bottom=CVModel.Property.pop2Left+'px';
-								CVModel.Obj.oPopContent2[3].style.height=(CVModel.Obj.oPopContent2[3].offsetHeight+CVModel.Property.pop2ySpeed)+'px';
-								CVModel.Obj.oPopContent2[3].style.right=CVModel.Property.pop2Top+'px';
-								CVModel.Obj.oPopContent2[3].style.width=(CVModel.Obj.oPopContent2[3].offsetWidth+CVModel.Property.pop2xSpeed)+'px';								
-							}
-							else{
-								clearInterval(timer1);
-								for (var i = 0; i < CVModel.Obj.oContent1.length; i++) {
-									CVModel.Obj.oContent1[i].style.display="block";
-								};
-								Status2=true;
-								endCheck();
-							}
-						}, 10);
-						function endCheck (){
-							if (Status1&&Status2) {
-								CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-								CVModel.Property.ableToClick=true;
-							}
-						}
-					},
-					switch2A:function(){
-						CVModel.Property.ableToClick=false;
-						var timer1 = setInterval(function(){
-							if (CVModel.Property.pop3Rotation<90) {
-								CVModel.Property.pop3Rotation+=6;
-								CVModel.Obj.oPopK3.style.transform="rotateX("+CVModel.Property.pop3Rotation+"deg)";
-								CVModel.Obj.oPopK3.style.webkitTransform="rotateX("+CVModel.Property.pop3Rotation+"deg)";
-							}
-							else{
-								clearInterval(timer1);
-								CVModel.Property.pop3Rotation=270;
-								CVModel.Obj.oPopK3.style.transform="rotateX(270deg)";
-								var timer2 =setInterval(function(){
-									if (CVModel.Property.centerRotation<360) {
-										CVModel.Property.centerRotation+=6;
-										CVModel.Obj.oMain.style.transform="rotateX("+CVModel.Property.centerRotation+"deg)";
-										CVModel.Obj.oMain.style.webkitTransform="rotateX("+CVModel.Property.centerRotation+"deg)";
-									}
-									else{
-										clearInterval(timer2);
-										CVModel.Property.centerRotation=0;
-										CVModel.Obj.oMain.style.transform="rotateX(0deg)";
-										CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-										CVModel.Property.ableToClick=true;
-									}
-								}, 30);
-							}
-						}, 30);
-					},
-					switch2B:function(){
-						CVModel.Property.ableToClick=false;
-						var timer1 = setInterval(function(){
-							if (CVModel.Property.centerRotation<90) {
-								CVModel.Property.centerRotation+=6;
-								CVModel.Obj.oMain.style.transform="rotateX("+CVModel.Property.centerRotation+"deg)";
-								CVModel.Obj.oMain.style.webkitTransform="rotateX("+CVModel.Property.centerRotation+"deg)";
-							}
-							else{
-								clearInterval(timer1);
-								CVModel.Property.centerRotation=270;
-								CVModel.Obj.oMain.style.transform="rotateX(270deg)";
-								var timer2 =setInterval(function(){
-									if (CVModel.Property.pop3Rotation<360) {
-										CVModel.Property.pop3Rotation+=6;
-										CVModel.Obj.oPopK3.style.transform="rotateX("+CVModel.Property.pop3Rotation+"deg)";
-										CVModel.Obj.oPopK3.style.webkitTransform="rotateX("+CVModel.Property.pop3Rotation+"deg)";
-									}
-									else{
-										clearInterval(timer2);
-										CVModel.Property.pop3Rotation=0;
-										CVModel.Obj.oPopK3.style.transform="rotateX(0deg)";
-										CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-										CVModel.Property.ableToClick=true;
-									}
-								}, 30);
-							}
-						}, 30);
-					},
-					switch3A:function(){
-						CVModel.Property.ableToClick=false;
-						var opacity=1;
-						var timer1 = setInterval(function(){
-							if (opacity>0) {
-								opacity-=0.05;
-								CVModel.Obj.oPopContent4.style.opacity=opacity;
-							}
-							else{
-								clearInterval(timer1);
-								CVModel.Obj.oPopContent4.style.display="none";
-								var top=-50;
-								var timer2 = setInterval(function(){
-									if (top<=20) {
-										top+=5;
-										CVModel.Obj.oMain.style.top=top+'px';
-									}
-									else{
-										clearInterval(timer2);
-										CVModel.main.contentSwitch.selectorSwitch(function(){
-											CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-											CVModel.Property.ableToClick=true;
-										});
-									}
-								}, 30)
-							}
-						}, 30)
-					},
-					switch3B:function(){
-						CVModel.Property.ableToClick=false;
-						var top=20;
-						CVModel.main.contentSwitch.selectorSwitch(action1);
-						function action1(){
-							var timer1 = setInterval(function(){
-								top-=5;
-								if (top>=-50) {
-									CVModel.Obj.oMain.style.top=top+'px';
-								}
-								else{
-									clearInterval(timer1);
-									var opacity=0;
-									CVModel.Obj.oPopContent4.style.display="block";
-									var timer2 =setInterval(function(){
-										if(opacity<1){
-											opacity+=0.05;
-											CVModel.Obj.oPopContent4.style.opacity=opacity;
-										}
-										else{
-											clearInterval(timer2);
-											CVModel.Property.ableToClick=true;
-											CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-										}
-									},30);
-								}
-							},30);							
-						}
-					},
-					switch4A:function(){
-						CVModel.Property.ableToClick=false;
-						var opacity=1;
-						for (var i = 0; i < CVModel.Obj.oContent5.length; i++) {
-							CVModel.Obj.oContent5[i].style.display="none";
-						};							
-						var timer1 = setInterval(function(){
-							if (opacity>0) {
-								opacity-=0.1;
-								for (var i = 0; i < 4; i++) {
-									CVModel.Obj.oPopTings2[i].style.opacity=opacity2;
-								};
-								CVModel.Obj.oPopK4.style.opacity=opacity2;
-							}
-							else{
-								clearInterval(timer1)
-								CVModel.Obj.oPopK4.style.display="none";
-								for (var i = 0; i < 4; i++) {
-									CVModel.Obj.oPopTings2[i].style.display="none";
-								};
-								var opacity2=0;
-								CVModel.Obj.oMain.style.display="block";
-								var timer2 = setInterval(function(){
-									if (opacity2<1) {
-										opacity2+=0.1;
-										CVModel.Obj.oMain.style.opacity=opacity2;
-									}
-									else{
-										clearInterval(timer2);
-										CVModel.Property.ableToClick=true;
-										CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-									}
-								}, 10)
-							}
-						}, 10);						
-					},
-					switch4B:function(){
-						CVModel.Property.ableToClick=false;
-						var opacity=1;
-						var timer1 = setInterval(function(){
-							if (opacity>0) {
-								opacity-=0.1;
-								CVModel.Obj.oMain.style.opacity=opacity;
-							}
-							else{
-								clearInterval(timer1)
-								CVModel.Obj.oMain.style.display="none";
-								CVModel.Obj.oPopK4.style.display="block";
-								for (var i = 0; i < 4; i++) {
-									CVModel.Obj.oPopTings2[i].style.display="block";
-								};
-								var opacity2 = 0;
-								var timer2 = setInterval(function(){
-									if (opacity2<1) {
-										opacity2+=0.1;
-										for (var i = 0; i < 4; i++) {
-											CVModel.Obj.oPopTings2[i].style.opacity=opacity2;
-										};
-										CVModel.Obj.oPopK4.style.opacity=opacity2;
-									}
-									else{
-										clearInterval(timer2);
-										CVModel.Property.ableToClick=true;
-										CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-										for (var i = 0; i < CVModel.Obj.oContent5.length; i++) {
-											CVModel.Obj.oContent5[i].style.display="block";
-										};										
-									}
-								}, 10)
-							}
-						}, 10);
-					},
-					switch5A:function(){
-						CVModel.Property.ableToClick=false;
-						var opacity=1;
-						for (var i = 0; i < CVModel.Obj.oContent6.length; i++) {
-							CVModel.Obj.oContent6[i].style.display="none";
-						};						
-						var timer1 = setInterval(function(){
-							if (opacity>=0) {
-								opacity-=0.1;
-								for (var i = 0; i < 4; i++) {
-									CVModel.Obj.oPopTings1[i].style.opacity=opacity;
-								};	
-							}
-							else{
-								clearInterval(timer1);
-								for (var i = 0; i < 4; i++) {
-									CVModel.Obj.oPopTings1[i].style.display="none";
-								};
-								CVModel.Obj.oMain.style.display="block";
-								var opacity2=0;
-								var timer2= setInterval(function(){
-									if (opacity2<1) {
-										opacity2+=0.1;
-										CVModel.Obj.oMain.style.opacity=opacity2;	
-									}
-									else{
-										clearInterval(timer2);
-										CVModel.Obj.oPopK5.style.display="none";
-										CVModel.Property.ableToClick=true;
-										CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-									}
-								}, 10);	
-							}
-						}, 10);
-					},
-					switch5B:function(){
-						CVModel.Property.ableToClick=false;
-						CVModel.Obj.oPopK5.style.display="block";
-						var opacity=1;
-						var timer1 = setInterval(function(){
-							if (opacity>0) {
-								opacity-=0.1;
-								CVModel.Obj.oMain.style.opacity=opacity;
-							}
-							else{
-								clearInterval(timer1);
-								CVModel.Obj.oMain.style.display="none";
-								for (var i = 0; i < 4; i++) {
-									CVModel.Obj.oPopTings1[i].style.display="block";
-								};
-								var opacity2=0;
-								var timer2 =setInterval(function(){
-									if (opacity2<1) {
-										opacity2+=0.1;
-										for (var i = 0; i < 4; i++) {
-											CVModel.Obj.oPopTings1[i].style.opacity=opacity2;
-										};
-									}
-									else{
-										clearInterval(timer2);
-										CVModel.Property.ableToClick=true;
-										CVModel.Property.switchStatus=!CVModel.Property.switchStatus;
-										for (var i = 0; i < CVModel.Obj.oContent6.length; i++) {
-											CVModel.Obj.oContent6[i].style.display="block";
-										};
-									}
-								}, 10);
-							}
-						}, 10);
-					},
-				},
-				popContentFunction:function(){
-					var au =document.createElement("audio");
-					au.preload="auto";
-					au.src="sfx/黄昏.mp3";
-					au.volume=0.6;
-					var status=true;
-					CVModel.Obj.oPlayPause.onclick=function(){
-						if (status) {
-							au.play();
-							CVModel.Obj.oPlayPause.innerHTML="暂停";
-						}
-						else{
-							au.pause();
-							CVModel.Obj.oPlayPause.innerHTML="播放";
-						}
-						status=!status;
-					}
-					CVModel.Obj.oReset.onclick=function(){
-						au.src="";
-						au.src="sfx/黄昏.mp3";
-						CVModel.Obj.oPlayPause.innerHTML="开始";
-						status=true;
-					}
-					var volume;
-					CVModel.Obj.oBar.onmousedown=function (ev)
-					{
-						var oEvent=ev||event;
-						var disX=oEvent.clientX-CVModel.Obj.oBar.offsetLeft;
-						document.onmousemove=function (ev)
-						{
-							var oEvent=ev||event;
-							var l=oEvent.clientX-disX;
-							var objLeft=Number(CVModel.Obj.oBar.style.left.replace("px",""));
-							
-							if (l<=90&&l>=-10) {
-								CVModel.Obj.oBar.style.left=l+'px';
-								CVModel.Obj.oMusicFilter.style.width=l+10+"px";
-								volume=(l+10)/100;
-								au.volume=volume;
-							};
-						};
-						document.onmouseup=function ()
-						{
-							document.onmousemove=null;
-							document.onmouseup=null;
-						};
-					};				
-				},
-				addPainter:function(){
-					function getStyle(obj,attr){
-						if (obj.currentStyle) {
-							return obj.currentStyle[attr];
-						}
-						else{
-							return getComputedStyle(obj, false)[attr];
-						}
-					}					
-					var gallerys = document.getElementsByClassName("imgContainer");
-					for (var i = 0; i < gallerys.length; i++) {
-						var tempImg =document.createElement('img')
-						tempImg.className="picture";
-						tempImg.src="img/paint"+i+".jpg";
-						tempImg.id="picture"+i;
-						gallerys[i].appendChild(tempImg);
-					};
-					var p0 = document.getElementById("picture0");
-					var p1 = document.getElementById("picture1");
-					var p2 = document.getElementById("picture2");
-					var timer1 = setInterval(function(){
-						if (gallerys[0].offsetHeight!=0&&gallerys[1].offsetHeight!=0&&gallerys[2].offsetHeight!=0) {
-							clearInterval(timer1);
-							addPicture(3);
-						};
-					}, 10);
-					var paintIndex=3;
-					var tempHeight=0;
-					var adderIndex=0;
-					function addPicture(index){
-						//var index=index;
-						if (index<25) {
-							tempHeight=gallerys[0].offsetHeight;
-							adderIndex=0;
-							for (var i = 0; i < gallerys.length; i++) {
-								if (tempHeight>gallerys[i].offsetHeight) {
-									tempHeight=gallerys[i].offsetHeight;
-									adderIndex=i;
-								};
-							};
+        box30:document.getElementById("box30"),
 
-							var tempContainerHeight=gallerys[adderIndex].offsetHeight;
-							var tempImg =document.createElement('img')
-							tempImg.className="picture";
-							tempImg.src="img/paint"+index+".jpg";
-							tempImg.id="picture"+index;								
-							gallerys[adderIndex].appendChild(tempImg);
-							var timer1 = setInterval(function(){
-								if (gallerys[adderIndex].offsetHeight!=tempContainerHeight) {
-									clearInterval(timer1);
-									kkk(index);
-								};
-							}, 10);							
-						}
-						else{
-							var oImg=document.getElementsByClassName("picture");
-							var oShowArea=document.getElementById("p531");
-							var oImgShow=document.getElementById("paintShow");
-							var oP531CloseBtn=document.getElementById("p531CloseBtn");
-							for (var i = 0; i < oImg.length; i++) {
-								oImg[i].onclick=function(){
-									oImgShow.src=this.src;
-									oShowArea.style.display="block";
-									if (oImgShow.offsetHeight>520) {
-										oImgShow.style.height="520px";
-										oImgShow.style.display="block";
-										oImgShow.style.margin="0 auto";
-									}
-									else if (oImgShow.offsetWidth>940){
-										oImgShow.style.width="940px";
-									}
-								}
-							};
-							oP531CloseBtn.onclick=function(){
-								oShowArea.style.display="none";
-							}
-						}
-					}
-					function kkk(index){
-						addPicture(index+1);
-					}
-				}
-			}
-		};
-		jQuery(document).ready(function($) {
-			CVModel.init();
-			CVModel.main.run();
-		});
+        box4s:document.getElementsByClassName('box4'),
+        box4close:document.getElementById("box4close"),
+
+        box50:document.getElementById("box50"),
+
+        page2:document.getElementById("page2"),
+        page4:document.getElementById("page4"),
+
+        oPlayPause:document.getElementById('PlayPause'),
+        oReset:document.getElementById('Reset'),
+        oBar:document.getElementById('bar'),
+        oMusicFilter:document.getElementById('musicFilter'),        
+	},
+	property:{
+        switchStatus:true,//菜单切换开关
+	},
+	init:function(){
+        //内容居中显示
+        function setCss(){
+            var docHeight=document.documentElement.clientHeight;
+            //alert(docHeight)
+            if (docHeight>700) {
+                var top=(docHeight-700)/2;
+                CVModel.obj.content.style.marginTop=top+'px';
+            };            
+        }
+        setCss();
+        window.onresize=function(){
+            setCss();
+        }
+	},
+	run:function(){
+        CVModel.dataImport();
+        CVModel.init();
+        CVModel.controller();
+        CVModel.camera();
+        CVModel.musicBox();
+        CVModel.galleryCreate();
+        console.log(navigator.language);
+	},
+    dataImport:function(){
+        CVModel.data=ResumeData.cn;
+    },
+    camera:function(){
+        //animation added here
+        CVModel.animate.menuBgFx();
+        CVModel.animate.commonAnim01.main();
+
+        CVModel.animate.page0Anim01.main();
+        CVModel.animate.page0Anim02.main();
+
+        CVModel.animate.page1Anim00.main();
+
+        CVModel.animate.page2Anim00.main();
+        CVModel.animate.page2Anim01.main();
+
+        CVModel.animate.page3Anim01.main();
+        CVModel.animate.page3Anim02.main();
+
+        CVModel.animate.page4Anim00.main();
+        CVModel.animate.page4Anim01.main();        
+
+        CVModel.animate.page5Anim00.main();
+        CVModel.animate.page5Anim01.main();        
+        
+        requestAnimationFrame(CVModel.camera);
+    },
+    animate:{
+        data:{
+            menuFxReg:0,
+            menuScrollReg:0,
+            menuScrollSpeed:10,
+            menuScrollState:0,
+
+            readyForClick:true,//true表示menu能够点击，false表示menu不能点击
+            switchStatus:true,//true表示menu处于可转动的状态，flase表示展开的状态
+        },
+        menuBgFx:function(){
+            CVModel.animate.data.menuFxReg+=1;
+            if (CVModel.animate.data.menuFxReg==360) {
+                CVModel.animate.data.menuFxReg=0;
+            };
+            CVModel.obj.menuFx.style.transform='rotate('+CVModel.animate.data.menuFxReg+'deg)';   
+        },
+        statusChange:function(ev){
+            var wheelSpeed=CVModel.animate.data.menuScrollSpeed;
+            if (ev.wheelDelta<0) {
+                wheelSpeed=-wheelSpeed;
+            };
+            CVModel.animate.data.menuScrollReg+=wheelSpeed;
+
+            if (CVModel.animate.data.menuScrollReg>=360) {
+                CVModel.animate.data.menuScrollReg=CVModel.animate.data.menuScrollReg-360;
+            }
+            else if(CVModel.animate.data.menuScrollReg<0){
+                CVModel.animate.data.menuScrollReg=CVModel.animate.data.menuScrollReg+360;
+            }
+
+            CVModel.obj.menuSelector.style.transform='rotate('+CVModel.animate.data.menuScrollReg+'deg)';
+
+            //计算转盘现在处于哪个状态
+            var state=6-Math.floor(CVModel.animate.data.menuScrollReg/60+0.5);
+            if (state==6) {
+                state=0;
+            };
+            //当发现状态改变时就执行变化
+            if (CVModel.animate.data.menuScrollState!=state) {
+                CVModel.animate.data.menuScrollState=state;
+                
+                CVModel.obj.menuIcon.src="img/menu/"+CVModel.animate.data.menuScrollState+".png";
+                CVModel.obj.background.style.backgroundColor=CVModel.data.bgColor[CVModel.animate.data.menuScrollState];
+                CVModel.obj.menuCenter.style.backgroundColor=CVModel.data.centerColor[CVModel.animate.data.menuScrollState];
+                CVModel.obj.title.innerHTML=CVModel.data.title[CVModel.animate.data.menuScrollState];
+                CVModel.obj.title.style.backgroundColor=CVModel.data.centerColor[CVModel.animate.data.menuScrollState];
+                CVModel.obj.info.innerHTML=CVModel.data.info[CVModel.animate.data.menuScrollState];
+
+                var pageIdStr='page'+CVModel.animate.data.menuScrollState;
+                for (var i = 0; i < CVModel.obj.pages.length; i++) {
+
+                    if (CVModel.obj.pages[i].id==pageIdStr) {
+                        if (CVModel.obj.pages[i].id=='page2'||CVModel.obj.pages[i].id=='page4') {
+                            CVModel.obj.pages[i].style.zIndex=3;
+                        }
+                        else{
+                            CVModel.obj.pages[i].style.zIndex=1;
+                        }
+                    }
+                    else{
+                        CVModel.obj.pages[i].style.zIndex=0;
+                    }
+                };
+            };
+        },
+        togglePage:function(){
+            
+            switch (CVModel.animate.data.menuScrollState){
+                case 0:page0AnimationController();break;
+                case 1:page1AnimationController();break;
+                case 2:page2AnimationController();break;
+                case 3:page3AnimationController();break;
+                case 4:page4AnimationController();break;
+                case 5:page5AnimationController();break;
+            }
+            CVModel.animate.data.readyForClick=false;
+            CVModel.animate.data.switchStatus=false;
+            function page0AnimationController(){
+                if (CVModel.animate.data.switchStatus==true) {
+                    animController(CVModel.animate.commonAnim01,'a',function(){
+                        CVModel.obj.box00.style.display='block';
+                        animController(CVModel.animate.page0Anim01,'a',function(){
+                            animController(CVModel.animate.page0Anim02,'b',function(){
+                                CVModel.animate.data.readyForClick=true;
+                            });
+                        })
+                    });
+                }
+                else{
+                    animController(CVModel.animate.page0Anim02,'a',function(){
+                        CVModel.obj.box00.style.display='none';
+                        animController(CVModel.animate.page0Anim01,'b',function(){
+                            animController(CVModel.animate.commonAnim01,'b',function(){
+                                CVModel.animate.data.switchStatus=true;
+                                CVModel.animate.data.readyForClick=true;                                
+                            });
+                            
+                        })
+                    });                    
+                }
+            }
+            function page1AnimationController(){
+                var contents=document.getElementsByClassName("box1content");
+                if (CVModel.animate.data.switchStatus==true) {
+                    animController(CVModel.animate.commonAnim01,'a',function(){
+
+                        animController(CVModel.animate.page1Anim00,'b',function(){
+                            CVModel.animate.data.readyForClick=true;
+                            for (var i = 0; i < contents.length; i++) {
+                                contents[i].style.display="block";
+                            };                            
+                        })
+                    });
+                }
+                else{
+                    for (var i = 0; i < contents.length; i++) {
+                        contents[i].style.display="none";
+                    };                    
+                    animController(CVModel.animate.page1Anim00,'a',function(){
+                        animController(CVModel.animate.commonAnim01,'b',function(){
+                            CVModel.animate.data.switchStatus=true;
+                            CVModel.animate.data.readyForClick=true; 
+                        })
+                    });
+                }
+            }
+
+            function page2AnimationController(){
+                if (CVModel.animate.data.switchStatus==true) {
+                    CVModel.obj.page2.style.display='block';
+                    animController(CVModel.animate.page2Anim00,'a',function(){
+                        for (var i = 0; i < CVModel.obj.box2s.length; i++) {
+                            CVModel.obj.box2s[i].style.display='block';
+                            CVModel.obj.box2close.style.display='block';
+                        };
+                        animController(CVModel.animate.page2Anim01,'b',function(){
+                            //CVModel.animate.data.readyForClick=true;
+                        });    
+                    });
+                }
+                else{
+                    
+                    animController(CVModel.animate.page2Anim01,'a',function(){
+                        for (var i = 0; i < CVModel.obj.box2s.length; i++) {
+                            CVModel.obj.box2s[i].style.display='none';
+                        };
+                        CVModel.obj.box2close.style.display='none';
+                        animController(CVModel.animate.page2Anim00,'b',function(){
+                            CVModel.obj.page2.style.display='none';
+                            
+                            CVModel.animate.data.switchStatus=true;
+                            CVModel.animate.data.readyForClick=true;
+                        });    
+                    });
+                }
+            }
+
+            function page3AnimationController(){
+                if (CVModel.animate.data.switchStatus==true) {
+                    animController(CVModel.animate.commonAnim01,'a',function(){
+                        animController(CVModel.animate.page3Anim01,'a',function(){
+                            CVModel.obj.box30.style.display='block';
+                            animController(CVModel.animate.page3Anim02,'b',function(){
+                                CVModel.animate.data.readyForClick=true;
+                            })
+                        })                        
+                    });
+                }
+                else{
+                    animController(CVModel.animate.page3Anim02,'a',function(){
+                        CVModel.obj.box30.style.display='none';
+                        animController(CVModel.animate.page3Anim01,'b',function(){
+                            animController(CVModel.animate.commonAnim01,'b',function(){
+                                CVModel.animate.data.switchStatus=true;
+                                CVModel.animate.data.readyForClick=true; 
+                            })
+                        })                        
+                    });
+                }
+            }
+
+            function page4AnimationController(){
+                if (CVModel.animate.data.switchStatus==true) {
+                    CVModel.obj.page4.style.display='block';
+                    
+                    animController(CVModel.animate.page4Anim00,'a',function(){
+                        for (var i = 0; i < CVModel.obj.box4s.length; i++) {
+                            CVModel.obj.box4s[i].style.display='block';
+                        };
+                        CVModel.obj.box4close.style.display='block';
+                        animController(CVModel.animate.page4Anim01,'b',function(){
+                            CVModel.animate.data.readyForClick=true;
+                        });    
+                    });
+                }
+                else{
+                    
+                    animController(CVModel.animate.page4Anim01,'a',function(){
+                        for (var i = 0; i < CVModel.obj.box4s.length; i++) {
+                            CVModel.obj.box4s[i].style.display='none';
+                        };
+                        box4close.style.display='none';
+                        animController(CVModel.animate.page4Anim00,'b',function(){
+                            CVModel.obj.page4.style.display='none';
+                            
+                            CVModel.animate.data.switchStatus=true;
+                            CVModel.animate.data.readyForClick=true;
+                        });    
+                    });
+                }
+            }
+
+            function page5AnimationController(){//这里注意，原PAGE2的动画放到了page5了
+                if (CVModel.animate.data.switchStatus==true) {
+                    animController(CVModel.animate.page5Anim00,'b',function(){
+                        animController(CVModel.animate.page5Anim01,'b',function(){
+                            CVModel.animate.data.readyForClick=true;                            
+                        })
+                    });
+                }
+                else{
+                    animController(CVModel.animate.page5Anim01,'a',function(){
+                        animController(CVModel.animate.page5Anim00,'a',function(){
+                            CVModel.animate.data.switchStatus=true;
+                            CVModel.animate.data.readyForClick=true;                            
+                        })
+                    });
+                }
+            }            
+            function animController(target,type,callback){
+                target.type=type;
+                target.trigger=true;
+                target.callback=callback;
+            }
+        },
+        commonAnimToggle:function(prop,anim){
+            if (prop.trigger==false) {
+                return;
+            };
+            prop.type=='a'?prop.targetData-=prop.speed:prop.targetData+=prop.speed;
+            if (prop.targetData==prop.rangeB||prop.targetData==prop.rangeA) {
+                prop.trigger=false;
+                if (prop.callback) {
+                    prop.callback();
+                };
+            };
+            if (anim) {
+                anim();
+            };
+        },
+        commonAnim01:{
+            //开关
+            trigger:false,
+            //运动类型
+            type:'a',//"a","b"
+            //回调函数
+            callback:null,
+            //属性
+            rangeA:500,
+            rangeB:350,
+            targetData:500,
+            speed:10,
+            main:function(){
+
+                var prop=this;
+                function anim(){
+                    var target=CVModel.obj.menuSelector.style;
+                    target.width=prop.targetData+'px';
+                    target.height=prop.targetData+'px';
+                    target.left=(500-prop.targetData)/2+'px';
+                    target.top=(500-prop.targetData)/2+'px';                    
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }
+        },
+        page0Anim01:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:230,
+            targetData:230,
+            speed:10,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var target=CVModel.obj.menu.style;
+                    target.left=prop.targetData+'px';                   
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }
+        },
+        page0Anim02:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:470,
+            targetData:0,
+            speed:23.5,
+            main:function(){
+                var prop=this;
+                
+                function anim(){
+                    var target=CVModel.obj.box00.style;
+                    target.width=prop.targetData+'px';
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }
+        },
+        page1Anim00:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:260,
+            targetData:0,
+            speed:10,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var xData=prop.targetData*47/26;
+                    var yData=prop.targetData;
+
+                    var target0=CVModel.obj.box10.style;
+                    target0.width=xData+'px';
+                    target0.height=yData+'px';
+                    target0.left=(470-xData)+'px';
+                    target0.top=(260-yData)+'px';
+
+                    var target1=CVModel.obj.box11.style;
+                    target1.width=xData+'px';
+                    target1.height=yData+'px';
+                    target1.right=(470-xData)+'px';
+                    target1.top=(260-yData)+'px';
+
+                    var target2=CVModel.obj.box12.style;
+                    target2.width=xData+'px';
+                    target2.height=yData+'px';
+                    target2.left=(470-xData)+'px';
+                    target2.bottom=(260-yData)+'px';
+
+                    var target3=CVModel.obj.box13.style;
+                    target3.width=xData+'px';
+                    target3.height=yData+'px';
+                    target3.right=(470-xData)+'px';
+                    target3.bottom=(260-yData)+'px';
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }
+        },
+        page2Anim00:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:10,
+            targetData:10,
+            speed:1,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var target=CVModel.obj.menu.style;
+                    target.opacity=prop.targetData/10;
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }            
+        },        
+        page2Anim01:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:10,
+            targetData:0,
+            speed:1,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var opacity=prop.targetData/10;
+                    for (var i = 0; i < CVModel.obj.box2s.length; i++) {
+                        CVModel.obj.box2s[i].style.opacity=opacity;
+                    };
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }            
+        },
+        page3Anim01:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:70,
+            targetData:70,
+            speed:5,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var target=CVModel.obj.menu.style;
+                    target.top=prop.targetData+'px';
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }
+        },
+        page3Anim02:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:10,
+            targetData:0,
+            speed:1,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var target=CVModel.obj.box30.style;
+                    target.opacity=prop.targetData/10;
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }
+        },
+        page4Anim00:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:10,
+            targetData:10,
+            speed:1,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var target=CVModel.obj.menu.style;
+                    target.opacity=prop.targetData/10;
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }            
+        },        
+        page4Anim01:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:10,
+            targetData:0,
+            speed:1,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var opacity=prop.targetData/10;
+                    for (var i = 0; i < CVModel.obj.box4s.length; i++) {
+                        CVModel.obj.box4s[i].style.opacity=opacity;
+                    };
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }            
+        },        
+        page5Anim00:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:0,
+            rangeB:90,
+            targetData:0,
+            speed:5,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var target=CVModel.obj.menu.style;
+                    // if (prop.targetData==360) {
+                    //     prop.targetData=0;
+                    // };
+                    target.transform="rotateX("+prop.targetData+"deg)";
+                    target.webkitTransform="rotateX("+prop.targetData+"deg)";
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }
+        },
+        page5Anim01:{
+            trigger:false,
+            type:'a',//"a","b"
+            callback:null,
+            rangeA:270,
+            rangeB:360,
+            targetData:270,
+            speed:5,
+            main:function(){
+                var prop=this;
+                function anim(){
+                    var target=CVModel.obj.box50.style;
+                    // if (prop.targetData==360) {
+                    //     prop.targetData=0;
+                    // };
+                    console.log(prop.targetData)
+                    target.transform="rotateX("+prop.targetData+"deg)";
+                    target.webkitTransform="rotateX("+prop.targetData+"deg)";
+                }
+                CVModel.animate.commonAnimToggle(prop,anim);
+            }
+        },        
+    },
+    controller:function(){
+        //语言切换
+        function changeLanguage(target,index/*target是被点击的dom元素,index是第几个按钮*/){
+            var classArr=target.className.split(' ');
+            if (classArr.length==1) {
+                if (index==0) {
+                    target.className='language_btn language_btnActive';
+                    CVModel.obj.language_btn[1].className='language_btn';
+                    CVModel.languageChange('en');
+                }
+                else{
+                    target.className='language_btn language_btnActive';
+                    CVModel.obj.language_btn[0].className='language_btn';
+                    CVModel.languageChange('cn');                   
+                }
+            }
+            else{
+                return;
+            }
+        }
+        CVModel.obj.language_btn[0].onclick=function(){
+            changeLanguage(this,0);
+        }
+        CVModel.obj.language_btn[1].onclick=function(){
+            changeLanguage(this,1);
+        }
+
+        //菜单滚动
+        function goWheel(ev){
+            if (CVModel.property.switchStatus) {
+                CVModel.animate.statusChange(ev);
+            };
+            return false;
+        } 
+        CVModel.obj.menu.onmousewheel=function(ev){
+            //readyForClick:true,//true表示menu能够点击，false表示menu不能点击
+            //switchStatus:true,//true表示menu处于可以关闭的状态，flase表示展开的状态
+
+            if (CVModel.animate.data.switchStatus==true) {
+                textInitStart();
+                goWheel(ev);
+            };
+            return false;
+        }
+        //菜单点击
+        CVModel.obj.menu.onclick=function(){
+            if (CVModel.animate.data.readyForClick==true) {
+                textInitStart();
+                CVModel.animate.togglePage();
+            };
+        }
+        CVModel.obj.box50.onclick=function(){
+            if (CVModel.animate.data.readyForClick==true) {
+                CVModel.animate.togglePage();
+            };
+        }
+        CVModel.obj.box2close.onclick=function(){
+            CVModel.animate.togglePage();
+        }
+        CVModel.obj.box4close.onclick=function(){
+            CVModel.animate.togglePage();
+        }
+        //在用户操作界面的时候载入文字
+        var startSwitch=true;
+        function textInitStart(){
+            if (startSwitch) {
+                startSwitch=false;
+                var activeElement=document.getElementsByClassName('language_btnActive')[0];
+                console.log(activeElement.id)
+                if (activeElement.id=='btn_en') {
+
+                    CVModel.languageChange('cn');
+                }
+                else{
+                    CVModel.languageChange('en');
+                }
+            };
+        }
+        //boxHover上的效果
+        var hoverBox=document.getElementsByClassName('hasHover');
+        var hoverShadow=document.getElementsByClassName('boxShadow');
+        for (var i = 0; i < hoverBox.length; i++) {
+            hoverBox[i].onmouseover=function(){
+                this.getElementsByClassName('boxShadow')[0].style.display='block';
+            }
+            hoverBox[i].onmouseout=function(){
+                this.getElementsByClassName('boxShadow')[0].style.display='none';
+            }
+        };
+
+        //详情弹出框
+        var hasPop=document.getElementsByClassName('hasPop');
+        for (var i = 0; i < hasPop.length; i++) {
+            hasPop[i].onclick=function(){
+                var str=this.id+'Pop';
+                document.getElementById(str).style.display='block';
+                var opacity=0;
+                var timer=setInterval(function(){
+                    
+                    if (opacity<15) {
+                        opacity+=1;
+                    }
+                    else{
+                        clearInterval(timer);
+                    }
+                    document.getElementById(str).style.opacity=opacity/15;
+                }, 16);
+            }
+        };
+        var bigPopCloseBtn=document.getElementsByClassName('BigPopCloseBtn');
+        for (var i = 0; i < bigPopCloseBtn.length; i++) {
+            bigPopCloseBtn[i].onclick=function(){
+                this.parentNode.style.display='none';
+                this.parentNode.style.opacity=0;
+            }
+        };        
+    },
+    languageChange:function(language){
+        CVModel.data=ResumeData[language];
+        //这里开始文本替换工作
+        var BindingDataobjs=document.getElementsByClassName('dataBinding');
+        for (var i = 0; i < BindingDataobjs.length; i++) {
+            if (BindingDataobjs[i].getAttribute('bindingIndex')!=null) {
+                BindingDataobjs[i].innerHTML=CVModel.data[BindingDataobjs[i].getAttribute('bindingData')][eval(BindingDataobjs[i].getAttribute('bindingIndex'))];
+            }
+            else{
+                BindingDataobjs[i].innerHTML=CVModel.data[BindingDataobjs[i].getAttribute('bindingData')];
+            }
+        };
+    },
+    musicBox:function(){
+        var au =document.createElement("audio");
+        au.preload="auto";
+        au.src="sfx/黄昏.mp3";
+        au.volume=0.6;
+        var status=true;
+        CVModel.obj.oPlayPause.onclick=function(){
+            if (status) {
+                au.play();
+                CVModel.obj.oPlayPause.innerHTML="暂停";
+            }
+            else{
+                au.pause();
+                CVModel.obj.oPlayPause.innerHTML="播放";
+            }
+            status=!status;
+        }
+        CVModel.obj.oReset.onclick=function(){
+            au.src="";
+            au.src="sfx/黄昏.mp3";
+            CVModel.obj.oPlayPause.innerHTML="开始";
+            status=true;
+        }
+        var volume;
+        CVModel.obj.oBar.onmousedown=function (ev)
+        {
+            var oEvent=ev||event;
+            var disX=oEvent.clientX-CVModel.obj.oBar.offsetLeft;
+            document.onmousemove=function (ev)
+            {
+                var oEvent=ev||event;
+                var l=oEvent.clientX-disX;
+                var objLeft=Number(CVModel.obj.oBar.style.left.replace("px",""));
+                
+                if (l<=90&&l>=-10) {
+                    CVModel.obj.oBar.style.left=l+'px';
+                    CVModel.obj.oMusicFilter.style.width=l+10+"px";
+                    volume=(l+10)/100;
+                    au.volume=volume;
+                };
+            };
+            document.onmouseup=function ()
+            {
+                document.onmousemove=null;
+                document.onmouseup=null;
+            };
+        };              
+    },
+    galleryCreate:function(){
+        var trigger=true;
+        if (trigger) {
+            trigger=false;
+            function getStyle(obj,attr){
+                if (obj.currentStyle) {
+                    return obj.currentStyle[attr];
+                }
+                else{
+                    return getComputedStyle(obj, false)[attr];
+                }
+            }                   
+            var gallerys = document.getElementsByClassName("imgContainer");
+            for (var i = 0; i < gallerys.length; i++) {
+                var tempImg =document.createElement('img')
+                tempImg.className="picture";
+                tempImg.src="img/art/paint"+i+".jpg";
+                tempImg.id="picture"+i;
+                gallerys[i].appendChild(tempImg);
+            };
+            var p0 = document.getElementById("picture0");
+            var p1 = document.getElementById("picture1");
+            var p2 = document.getElementById("picture2");
+            var timer1 = setInterval(function(){
+                if (gallerys[0].offsetHeight!=0&&gallerys[1].offsetHeight!=0&&gallerys[2].offsetHeight!=0) {
+                    clearInterval(timer1);
+                    addPicture(3);
+                };
+            }, 10);
+            var paintIndex=3;
+            var tempHeight=0;
+            var adderIndex=0;
+            function addPicture(index){
+                //var index=index;
+                if (index<25) {
+                    tempHeight=gallerys[0].offsetHeight;
+                    adderIndex=0;
+                    for (var i = 0; i < gallerys.length; i++) {
+                        if (tempHeight>gallerys[i].offsetHeight) {
+                            tempHeight=gallerys[i].offsetHeight;
+                            adderIndex=i;
+                        };
+                    };
+                    var tempContainerHeight=gallerys[adderIndex].offsetHeight;
+                    var tempImg =document.createElement('img')
+                    tempImg.className="picture";
+                    tempImg.src="img/art/paint"+index+".jpg";
+                    tempImg.id="picture"+index;                             
+                    gallerys[adderIndex].appendChild(tempImg);
+                    var timer1 = setInterval(function(){
+                        if (gallerys[adderIndex].offsetHeight!=tempContainerHeight) {
+                            clearInterval(timer1);
+                            kkk(index);
+                        };
+                    }, 10);                         
+                }
+                else{
+                    var oImg=document.getElementsByClassName("picture");
+                    var oShowArea=document.getElementById("p531");
+                    var oImgShow=document.getElementById("paintShow");
+                    var oP531CloseBtn=document.getElementById("p531CloseBtn");
+                    for (var i = 0; i < oImg.length; i++) {
+                        oImg[i].onclick=function(){
+                            oImgShow.src=this.src;
+                            var opacity=0;
+                            var timer =setInterval(function(){
+                                if (opacity<15) {
+                                    opacity+=1;
+                                }
+                                else{
+                                    clearInterval(timer);
+                                }
+                                oShowArea.style.opacity=opacity/15;
+                            }, 16);
+                            oShowArea.style.display="block";
+                            if (oImgShow.offsetHeight>520) {
+                                oImgShow.style.height="520px";
+                                oImgShow.style.display="block";
+                                oImgShow.style.margin="0 auto";
+                            }
+                            else if (oImgShow.offsetWidth>940){
+                                oImgShow.style.width="940px";
+                            }
+                        }
+                    };
+                    oP531CloseBtn.onclick=function(){
+                        oShowArea.style.display="none";
+                        oShowArea.style.opacity=0;
+                    }
+                }
+            }
+            function kkk(index){
+                addPicture(index+1);
+            }
+        };      
+    }
+}
+CommonTools.ready(CVModel.run);
