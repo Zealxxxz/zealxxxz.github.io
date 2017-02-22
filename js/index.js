@@ -318,7 +318,6 @@ var CVModel={
         CVModel.camera();
         CVModel.musicBox();
         CVModel.galleryCreate();
-        console.log(navigator.language);
 	},
     dataImport:function(){
         CVModel.data=ResumeData.cn;
@@ -841,7 +840,6 @@ var CVModel={
                     // if (prop.targetData==360) {
                     //     prop.targetData=0;
                     // };
-                    console.log(prop.targetData)
                     target.transform="rotateX("+prop.targetData+"deg)";
                     target.webkitTransform="rotateX("+prop.targetData+"deg)";
                 }
@@ -1097,7 +1095,6 @@ var CVModel={
                 var index =getMinHeightIndex();
                 gallerys[index].appendChild(img);
                 gallerysHeight[index]+=cHeight;
-                console.log(gallerys[index])
                 function getMinHeightIndex(){
                     var index=0;
                     var tempHeight=gallerysHeight[0];
