@@ -893,6 +893,20 @@ var CVModel={
             };
             return false;
         }
+        CVModel.obj.menu.addEventListener('touchmove', function(ev){
+            if (CVModel.animate.data.switchStatus==true) {
+                textInitStart();
+                goWheel(ev);
+            };
+            return false;
+        }, false);                  
+        CVModel.obj.menu.addEventListener('DOMMouseScroll', function(ev){
+            if (CVModel.animate.data.switchStatus==true) {
+                textInitStart();
+                goWheel(ev);
+            };
+            return false;
+        }, false);        
         //菜单点击
         CVModel.obj.menu.onclick=function(){
             if (CVModel.animate.data.readyForClick==true) {
@@ -1028,98 +1042,78 @@ var CVModel={
         };              
     },
     galleryCreate:function(){
+
         var trigger=true;
         if (trigger) {
             trigger=false;
-            function getStyle(obj,attr){
-                if (obj.currentStyle) {
-                    return obj.currentStyle[attr];
-                }
-                else{
-                    return getComputedStyle(obj, false)[attr];
-                }
-            }                   
-            var gallerys = document.getElementsByClassName("imgContainer");
-            for (var i = 0; i < gallerys.length; i++) {
-                var tempImg =document.createElement('img')
-                tempImg.className="picture";
-                tempImg.src="img/art/paint"+i+".jpg";
-                tempImg.id="picture"+i;
-                gallerys[i].appendChild(tempImg);
-            };
-            var p0 = document.getElementById("picture0");
-            var p1 = document.getElementById("picture1");
-            var p2 = document.getElementById("picture2");
-            var timer1 = setInterval(function(){
-                if (gallerys[0].offsetHeight!=0&&gallerys[1].offsetHeight!=0&&gallerys[2].offsetHeight!=0) {
-                    clearInterval(timer1);
-                    addPicture(3);
+            var imgIndex=0;
+            function loadImg(){
+                if (imgIndex>25) {
+                    return;
                 };
-            }, 1000);
-            var paintIndex=3;
-            var tempHeight=0;
-            var adderIndex=0;
-            function addPicture(index){
-                //var index=index;
-                if (index<25) {
-                    tempHeight=gallerys[0].offsetHeight;
-                    adderIndex=0;
-                    for (var i = 0; i < gallerys.length; i++) {
-                        if (tempHeight>gallerys[i].offsetHeight) {
-                            tempHeight=gallerys[i].offsetHeight;
-                            adderIndex=i;
-                        };
-                    };
-                    var tempContainerHeight=gallerys[adderIndex].offsetHeight;
-                    var tempImg =document.createElement('img')
-                    tempImg.className="picture";
-                    tempImg.src="img/art/paint"+index+".jpg";
-                    tempImg.id="picture"+index;                             
-                    gallerys[adderIndex].appendChild(tempImg);
-                    var timer1 = setInterval(function(){
-                        if (gallerys[adderIndex].offsetHeight!=tempContainerHeight) {
-                            clearInterval(timer1);
-                            kkk(index);
-                        };
-                    }, 10);                         
-                }
-                else{
-                    var oImg=document.getElementsByClassName("picture");
-                    var oShowArea=document.getElementById("p531");
-                    var oImgShow=document.getElementById("paintShow");
-                    var oP531CloseBtn=document.getElementById("p531CloseBtn");
-                    for (var i = 0; i < oImg.length; i++) {
-                        oImg[i].onclick=function(){
-                            oImgShow.src=this.src;
-                            var opacity=0;
-                            var timer =setInterval(function(){
-                                if (opacity<15) {
-                                    opacity+=1;
-                                }
-                                else{
-                                    clearInterval(timer);
-                                }
-                                oShowArea.style.opacity=opacity/15;
-                            }, 16);
-                            oShowArea.style.display="block";
-                            if (oImgShow.offsetHeight>520) {
-                                oImgShow.style.height="520px";
-                                oImgShow.style.display="block";
-                                oImgShow.style.margin="0 auto";
-                            }
-                            else if (oImgShow.offsetWidth>940){
-                                oImgShow.style.width="940px";
-                            }
-                        }
-                    };
-                    oP531CloseBtn.onclick=function(){
-                        oShowArea.style.display="none";
-                        oShowArea.style.opacity=0;
-                    }
+                var img =new Image();
+                img.src='img/art/paint'+imgIndex+'.jpg';
+                img.id="picture"+imgIndex;
+                img.onload=function(){
+                    //img.width=300;
+                    appendImg(img);
+                    imgIndex++;
+                    loadImg();
                 }
             }
-            function kkk(index){
-                addPicture(index+1);
+            loadImg();
+            var gallerys = document.getElementsByClassName("imgContainer");
+            var oShowArea=document.getElementById("p531");
+            var oImgShow=document.getElementById("paintShow");           
+            var gallerysHeight=[0,0,0];
+            function appendImg(img){
+                //console.log(img.width);
+                var cHeight=300*img.height/img.width;
+                img.width=300;
+                img.height=cHeight;
+                img.style.cursor='pointer';
+                img.onclick=function(){
+                    oImgShow.src=this.src;
+                     var opacity=0;
+                     var timer =setInterval(function(){
+                         if (opacity<15) {
+                             opacity+=1;
+                         }
+                         else{
+                             clearInterval(timer);
+                         }
+                         oShowArea.style.opacity=opacity/15;
+                     }, 16);
+                     oShowArea.style.display="block";
+                     if (oImgShow.offsetHeight>520) {
+                         oImgShow.style.height="520px";
+                         oImgShow.style.display="block";
+                         oImgShow.style.margin="0 auto";
+                     }
+                     else if (oImgShow.offsetWidth>940){
+                         oImgShow.style.width="940px";
+                     }                    
+                }
+                var index =getMinHeightIndex();
+                gallerys[index].appendChild(img);
+                gallerysHeight[index]+=cHeight;
+                console.log(gallerys[index])
+                function getMinHeightIndex(){
+                    var index=0;
+                    var tempHeight=gallerysHeight[0];
+                    for (var i = 1; i < gallerysHeight.length; i++) {
+                        if (gallerysHeight[i]<tempHeight) {
+                            index=i
+                        };
+                    };
+                    return index;
+                }
+            }
+
+            var oP531CloseBtn=document.getElementById("p531CloseBtn");
+            oP531CloseBtn.onclick=function(){
+                oShowArea.style.display="none";
+                oShowArea.style.opacity=0;
             }
         };      
     }
