@@ -1089,22 +1089,16 @@ var CVModel={
         var trigger=true;
         if (trigger) {
             trigger=false;
-            var imgIndex=0;
-            function loadImg(){
-                if (imgIndex>25) {
-                    return;
-                };
+            var a=[];
+            for (var i = 0; i < 25; i++) {
                 var img =new Image();
-                img.src='img/art/paint'+imgIndex+'.jpg';
-                img.id="picture"+imgIndex;
+                img.src='img/art/paint'+i+'.jpg';
+                img.id="picture"+i;
                 img.onload=function(){
-                    //img.width=300;
-                    appendImg(img);
-                    imgIndex++;
-                    loadImg();
-                }
-            }
-            loadImg();
+                    img.width=300;
+                    appendImg(this);
+                } 
+            };
             var gallerys = document.getElementsByClassName("imgContainer");
             var oShowArea=document.getElementById("p531");
             var oImgShow=document.getElementById("paintShow");           
