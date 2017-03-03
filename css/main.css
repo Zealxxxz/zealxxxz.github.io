@@ -6,7 +6,9 @@
 body{
 	background: green; 
 }
-
+.main{
+	height: 750px;
+}
 /*导航部分，语言选择*/
 .nav{
 	height: 30px; padding: 10px;
@@ -278,4 +280,10 @@ body{
 }
 .boxinfo1{
 	font-size: 20px; line-height: 230px;
+}
+
+/*Loading*/
+.loading{
+	z-index: 100; background: green; 
+	text-indent: 400px; line-height: 540px; color: #fff; font-size: 40px;
 }

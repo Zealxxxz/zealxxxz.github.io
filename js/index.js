@@ -58,7 +58,35 @@ var CommonTools={
         else{
             return getComputedStyle(obj, false)[attr];
         }
-    }    
+    },
+    ImageLoader:function(images,callback/*images是数组数组对象，callback是要执行的函数*/){
+        var loadingSwitcher=[];
+        var length=images.length;
+        for (var i = 0; i < length; i++) {
+            loadingSwitcher[i]=false;
+        }
+        for (var j = 0; j < length; j++) {
+            if (loadingSwitcher[j]==false) {
+                var img =new Image();
+                img.src=images[j];
+                img.setAttribute('sid', j);
+                img.onload=function(a){
+                    loadingSwitcher[this.getAttribute('sid')]=true;
+                    finishLoading();
+                }                
+            };
+        }
+        function finishLoading(){
+            for (var i = 0; i < length; i++) {
+                if (loadingSwitcher[i]==false) {
+                    return;
+                }
+            }
+            if (callback) {
+                callback();
+            };
+        }
+    }
 }
 var ResumeData={
 	cn:{
@@ -149,7 +177,7 @@ var ResumeData={
             "音量",
             "重置",
         ],             
-        page5info:"<p>三年游戏策划，一年web前端开发</p><p>纵观我的职业生涯，从核心向游戏转向网游，从游戏行业转向web开发，做的东西受众面越来越广，随着阅历的增加对待事物的看法也在不断地变化</p><p>不变的是我喜欢创造的心，喜欢分享的心，也是我感觉人生的价值所在</p><p>希望我能成为你新的伙伴! <a href='asset/web前端-李雪辰.pdf'>点此下载简历</a></p>",
+        page5info:"<p>一年web前端开发，三年游戏策划</p><p>代码风骚（未加密请F12直接观看），性格开朗</p><p>希望我能成为你新的伙伴! <a href='asset/web前端-李雪辰.pdf'>点此下载简历</a></p>",
     },
 	en:{
         centerColor:[
@@ -253,7 +281,18 @@ var ResumeData={
     },
 }
 var CVModel={
-    data:{},//信息存储区
+    data:{
+        preLoadImg:[
+            'img/menu/menu0.png',
+            'img/menu/menu1.png',
+            'img/menu/menu2.png',
+            'img/menu/menu3.png',
+            'img/menu/menu4.png',
+            'img/menu/menu5.png',
+            'img/menu/selector.png',
+            'img/menu/圆环.png',
+        ],
+    },//信息存储区
 	obj:{
         docTitle:document.getElementById("docTitle"),
         background:document.getElementById("background"),
@@ -312,12 +351,13 @@ var CVModel={
         }
 	},
 	run:function(){
+        CommonTools.ImageLoader(CVModel.data.preLoadImg,CVModel.actionAfterLoading);
+        CVModel.consoleInfo();
         CVModel.dataImport();
         CVModel.init();
         CVModel.controller();
         CVModel.camera();
         CVModel.musicBox();
-        CVModel.galleryCreate();
 	},
     dataImport:function(){
         CVModel.data=ResumeData.cn;
@@ -361,7 +401,8 @@ var CVModel={
             if (CVModel.animate.data.menuFxReg==360) {
                 CVModel.animate.data.menuFxReg=0;
             };
-            CVModel.obj.menuFx.style.transform='rotate('+CVModel.animate.data.menuFxReg+'deg)';   
+            CVModel.obj.menuFx.style.transform='rotate('+CVModel.animate.data.menuFxReg+'deg)';
+            CVModel.obj.menuFx.style.webkitTransform='rotate('+CVModel.animate.data.menuFxReg+'deg)';
         },
         statusChange:function(ev){
             var wheelSpeed=CVModel.animate.data.menuScrollSpeed;
@@ -378,6 +419,8 @@ var CVModel={
             }
 
             CVModel.obj.menuSelector.style.transform='rotate('+CVModel.animate.data.menuScrollReg+'deg)';
+            CVModel.obj.menuSelector.style.webkitTransform='rotate('+CVModel.animate.data.menuScrollReg+'deg)';
+            
 
             //计算转盘现在处于哪个状态
             var state=6-Math.floor(CVModel.animate.data.menuScrollReg/60+0.5);
@@ -929,9 +972,7 @@ var CVModel={
             if (startSwitch) {
                 startSwitch=false;
                 var activeElement=document.getElementsByClassName('language_btnActive')[0];
-                console.log(activeElement.id)
                 if (activeElement.id=='btn_en') {
-
                     CVModel.languageChange('cn');
                 }
                 else{
@@ -955,6 +996,10 @@ var CVModel={
         var hasPop=document.getElementsByClassName('hasPop');
         for (var i = 0; i < hasPop.length; i++) {
             hasPop[i].onclick=function(){
+                console.log(this.id);
+                if (this.id=='box41') {
+                    CVModel.galleryCreate();
+                };
                 var str=this.id+'Pop';
                 document.getElementById(str).style.display='block';
                 var opacity=0;
@@ -1113,6 +1158,24 @@ var CVModel={
                 oShowArea.style.opacity=0;
             }
         };      
+    },
+    actionAfterLoading:function(){
+        document.getElementById('Loading').style.display='none';
+        var images=document.getElementsByTagName('img');
+        var length=images.length;
+        for (var i = 0; i < length; i++) {
+            images[i].src=images[i].getAttribute('imgsrc');
+        };
+    },
+    consoleInfo:function(){
+        var message='一张网页，要经历怎样的过程，才能让你找到这里？\n一位雇员，要经历怎样的磨炼，才能进去你的公司？\n追求未知真理\n携手迎接挑战\n共创美好未来\n请拨打电话至：13269013574';
+        var isChrome = window.navigator.userAgent.indexOf("Chrome") !== -1;
+
+        if (isChrome) {
+            console.log('%c'+message+'', 'font-size:12px;color:#000;text-shadow:0 1px 0#ccc,0 1px 0 #c9c9c9,0 1px 0 #bbb,0 4px 0 #b9b9b9,0 1px 0 #aaa,0 1px 1px rgba(0,0,0,.1),0 0 1px rgba(0,0,0,.1),0 1px 1px rgba(0,0,0,.3),0 1px 1px rgba(0,0,0,.2),0 5px 10px rgba(0,0,0,.25),0 1px 1px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.15);');
+        } else {
+            console.log(message);
+        }
     }
 }
 CommonTools.ready(CVModel.run);
