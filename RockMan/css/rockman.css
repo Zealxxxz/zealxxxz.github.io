@@ -1,0 +1,226 @@
+		#container{
+			width: 960px; height: 600px; margin: 0 auto; background: url(../img/megaManWall.png) repeat;
+			position: relative;
+		}
+		#gameArea{
+			width: 800px; height: 600px; margin: 0 auto; background: blue; position: absolute; overflow: hidden; top: 0; left: 80px;
+		}
+		#mc{
+			width: 40px; height: 50px; position: absolute;  top: -70px; left: 100px;
+		}
+		#ground{
+			width: 800px; height: 50px; position: absolute; background: url(../img/megaManGround.png) repeat-x; top:550px; left: 0;
+		}
+		.bullet{
+			width: 16px; height: 12px; background: url(../img/final1.png) -519px -124px; position: absolute;
+		}
+
+		.PlayerFall{
+			width: 14px; height: 65px; background: url(../img/final1.png) -2px -1px; 
+		}
+		.PlayerStand{
+			width: 40px; height: 50px; background: url(../img/final1.png) -124px -16px; 
+			border: none;
+		}
+		.PlayerRun1{
+			width: 50px; height: 50px; background: url(../img/final1.png) -212px -20px;
+			border: none;
+		}
+		.PlayerRun2{
+			width: 35px; height: 50px; background: url(../img/final1.png) -262px -18px;
+		}
+		.PlayerRun3{
+			width: 42px; height: 45px; background: url(../img/final1.png) -301px -22px;
+		}
+		.PlayerRun4{
+			width: 35px; height: 50px; background: url(../img/final1.png) -262px -18px;
+		}
+		.PlayerJump{
+			width: 52px; height: 60px; background: url(../img/final1.png) -464px -5px;
+			position: absolute; left: -10px; top: -3px;
+		}
+		.PlayerHurt{
+			width: 52px; height: 55px; background: url(../img/final1.png) -407px -10px;
+		}
+		.PlayerShootStand{
+			width: 64px; height: 50px; background: url(../img/final1.png) -436px -162px;
+		}
+		.PlayerShootJump{
+			width: 58px; height: 60px; background: url(../img/final1.png) -378px -154px;
+		}
+		.PlayerShootRun1{
+			width: 60px; height: 44px; background: url(../img/final1.png) -252px -169px;
+		}
+		.PlayerShootRun2{
+			width: 52px; height: 50px; background: url(../img/final1.png) -199px -165px;
+		}
+		.PlayerShootRun3{
+			width: 60px; height: 45px; background: url(../img/final1.png) -315px -169px; 
+		}
+		.PlayerShootRun4{
+			width: 52px; height: 50px; background: url(../img/final1.png) -199px -165px;
+		}
+
+		.EnemyStone{
+			width: 128px; height: 127px; background: url(../img/boss.png) -16px -430px;
+			position: absolute; left: 660px; top: -150px;
+		}
+		.StoneFragment1{
+			width: 65px; height: 65px; background: url(../img/boss.png) -833px -428px;
+			position: absolute; left: 660px; top: 420px; display: none;
+		}
+		.StoneFragment2{
+			width: 65px; height: 65px; background: url(../img/boss.png) -829px -493px;
+			position: absolute; left: 720px; top: 420px; display: none;
+		}
+		.StoneFragment3{
+			width: 65px; height: 65px; background: url(../img/boss.png) -906px -428px;
+			position: absolute; left: 660px; top: 480px; display: none;
+		}
+		.StoneFragment4{
+			width: 63px; height: 65px; background: url(../img/boss.png) -906px -493px;
+			position: absolute; left: 720px; top: 480px; display: none;
+		}
+		#enemy{
+			width: 60px; height: 90px; position: absolute; top: 460px; left: 700px;
+			display: none; border: none;
+		}		
+		.EnemyStand0{
+			width: 100px; height: 143px; background: url(../img/boss.png);
+			position: absolute; left: -40px; top: -53px;
+		}
+		.EnemyStand1{
+			width: 100px; height: 143px; background: url(../img/boss.png) -100px 0;
+			position: absolute; left: -40px; top: -53px;
+		}
+		.EnemyStand2{
+			width: 100px; height: 143px; background: url(../img/boss.png) -200px 0;
+			position: absolute; left: -40px; top: -53px;
+		}
+		.EnemyStand3{
+			width: 100px; height: 143px; background: url(../img/boss.png) -300px 0;
+			position: absolute; left: -40px; top: -53px;
+		}
+		.EnemyStand4{
+			width: 100px; height: 143px; background: url(../img/boss.png) -400px 0;
+			position: absolute; left: -40px; top: -53px;
+		}
+		.EnemyStand5{
+			width: 100px; height: 143px; background: url(../img/boss.png) -500px 0;
+			position: absolute; left: -40px; top: -53px;
+		}
+		.EnemyStand6{
+			width: 100px; height: 143px; background: url(../img/boss.png) -600px 0;
+			position: absolute; left: -40px; top: -53px;
+		}
+		
+		.EnemyShoot1{
+			width: 152px; height: 125px; background: url(../img/boss.png) -400px -163px;
+			position: absolute; left: -85px; top: -35px;
+		}
+		.EnemyShoot2{
+			width: 152px; height: 125px; background: url(../img/boss.png) -550px -163px;
+			position: absolute; left: -85px; top: -35px;
+		}
+		.EnemyShoot3{
+			width: 152px; height: 125px; background: url(../img/boss.png) -700px -163px;
+			position: absolute; left: -85px; top: -35px;
+		}
+		.EnemyShoot4{
+			width: 152px; height: 125px; background: url(../img/boss.png) -850px -163px;
+			position: absolute; left: -85px; top: -35px;
+		}
+		.EnemyShoot5{
+			width: 152px; height: 125px; background: url(../img/boss.png) -1000px -163px;
+			position: absolute; left: -40px; top: -35px;
+		}
+		.EnemyJump0{
+			width: 150px; height: 143px; background: url(../img/boss.png) -702px 0px;
+			position: absolute; left: -75px; top: -40px;
+		}
+		.EnemyJump1{
+			width: 140px; height: 143px; background: url(../img/boss.png) -850px 0px;
+			position: absolute; left: -40px; top: -40px;
+		}
+		.EnemyJump2{
+			width: 106px; height: 143px; background: url(../img/boss.png) -978px 0px;
+			position: absolute; left: -40px; top: -40px;
+		}
+		.EnemyBullet0{
+			width: 128px; height: 64px; background: url(../img/boss.png) -15px -573px;  position: absolute;
+		}
+		.EnemyBullet1{
+			width: 128px; height: 64px; background: url(../img/boss.png) -155px -573px; position: absolute;
+		}
+		.EnemyBullet2{
+			width: 128px; height: 64px; background: url(../img/boss.png) -295px -573px; position: absolute;
+		}
+		.EnemyRoll0{
+			width: 150px; height: 53px; background: url(../img/boss.png) 0px -339px; position: absolute;
+		}
+		.EnemyRoll1{
+			width: 150px; height: 53px; background: url(../img/boss.png) -150px -339px; position: absolute;
+		}
+		.EnemyRoll2{
+			width: 150px; height: 53px; background: url(../img/boss.png) -300px -339px; position: absolute;
+		}
+		.EnemyRoll3{
+			width: 150px; height: 53px; background: url(../img/boss.png) -450px -339px; position: absolute;
+		}
+		.EnemyFoot0{
+			width: 100px; height: 43px; background: url(../img/boss.png) 0px -245px; position: absolute;
+		}
+		.EnemyFoot1{
+			width: 100px; height: 43px; background: url(../img/boss.png) -200px -245px; position: absolute;
+		}		
+		.EnemyFoot2{
+			width: 100px; height: 43px; background: url(../img/boss.png) -100px -245px; position: absolute;
+		}
+		.EnemyFoot3{
+			width: 100px; height: 43px; background: url(../img/boss.png) -200px -245px; position: absolute;
+		}	
+		.EnemyFly{
+			width: 100px; height: 78px; background: url(../img/boss.png) -300px -178px; position: absolute;
+		}
+
+		.LifeBar{
+			width: 18px; height: 100px; background: #000; border: 2px solid #000;
+		}
+		#mcLifeBar{
+			position: absolute; left: 20px; top: 20px; 
+		}
+		#enemyLifeBar{
+			position: absolute; right: 20px; top: 20px;
+		}
+		.filter{
+			width: 18px; height: 100px; background: green; position: absolute; bottom:0;
+		}
+		#enemyFilter{
+			background: yellow; height: 0px;
+		}
+		#message,#message1{
+			width: 400px; height: 50px; margin: 200px auto;
+			font-size: 40px; text-align: center; color:#fff;
+		}
+		#message1{
+			display: none;
+		}
+		#restartBtn{
+			width: 80px; height: 30px; position: absolute; top: 20px; left: 100px; border: 2px solid #fff;
+			color:#fff; line-height: 30px; text-align: center; cursor: pointer; display: none;
+		}
+		#controllerInfo{
+			width: 960px; height: 50px; line-height: 50px; text-align: center; margin: 0 auto;
+			font-size: 20px;
+		}
+
+		#storyArea{
+			width: 960px; height: 600px; background: #4A4242; z-index: 100; position: absolute;
+		}
+		#storyArea>img{
+			display: block; margin: 0 auto;
+		}
+		#nextBtn{
+			width: 100px; height: 40px; background: #6B6B88; position: absolute; bottom: 20px; right: 20px; cursor: pointer; line-height: 40px; border-radius: 5px; border: 2px solid #6C963B; color:#fff; text-align: center;
+
+		}
